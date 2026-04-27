@@ -4,7 +4,7 @@ pub struct Lexer {
     input: Vec<char>,
     pos: usize,
     state: u32,
-    line: u32
+    pub line: u32
 }
 
 impl Lexer {
