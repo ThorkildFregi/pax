@@ -12,6 +12,9 @@ pub enum Token {
 
     Assign,
 
+    Plus,
+    Minus,
+
     Semicolon,
     EOF,
 

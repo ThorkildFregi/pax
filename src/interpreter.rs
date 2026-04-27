@@ -1,4 +1,6 @@
 use std::collections::HashMap;
+
+use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
 
 pub struct Interpreter {
@@ -38,6 +40,16 @@ impl Interpreter {
             Expr::Integer(n) => n,
             Expr::Variable(name) => {
                 *self.variables.get(&name).expect("Variable not found")
+            }
+            Expr::Binary {left, operator, right} => {
+                let l = self.evaluate(*left);
+                let r = self.evaluate(*right);
+
+                match operator {
+                    Token::Plus => l + r,
+                    Token::Minus => l - r,
+                    _ => panic!("Operator not supported"),
+                }
             }
         }
     }

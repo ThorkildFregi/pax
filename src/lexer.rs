@@ -53,6 +53,14 @@ impl Lexer {
                         self.pos += 1;
                         return Token::RightBracket;
                     }
+                    '+' => {
+                        self.pos += 1;
+                        return Token::Plus;
+                    }
+                    '-' => {
+                        self.pos += 1;
+                        return Token::Minus;
+                    }
                     ';' => {
                         self.pos += 1;
                         return Token::Semicolon;

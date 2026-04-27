@@ -55,7 +55,7 @@ macro_rules! parse_print {
 
             expect_token!($parser, Token::LeftBracket);
 
-            let value = parse_atom!($parser);
+            let value = $parser.parse_expression()?;
 
             expect_token!($parser, Token::RightBracket);
             
@@ -74,6 +74,12 @@ pub enum Expr {
     Integer(i64),
 
     Variable(String),
+
+    Binary {
+        left: Box<Expr>,
+        operator: Token,
+        right: Box<Expr>,
+    },
 }
 
 #[derive(Debug)]
@@ -125,6 +131,25 @@ impl Parser {
         Ok(program)
     }
 
+    fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {
+        let mut left = parse_atom!(self);
+
+        while self.current_token == Token::Plus || self.current_token == Token::Minus {
+            let operator = self.current_token.clone();
+            self.advance();
+
+            let right = parse_atom!(self);
+
+            left = Expr::Binary {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            };
+        }
+
+        Ok(left)
+    }
+
     fn parse_statement(&mut self) -> Result<Stmt, SyntaxError> {
         match &self.current_token {
             Token::Error(msg) => Err(SyntaxError { 
@@ -150,7 +175,7 @@ impl Parser {
 
         expect_token!(self, Token::Assign);
 
-        let value = parse_atom!(self);
+        let value = self.parse_expression()?;
 
         expect_token!(self, Token::Semicolon);
 
