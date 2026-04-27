@@ -27,9 +27,7 @@ fn main() {
         Ok(program) => {
             let mut interpreter = Interpreter::new();
             interpreter.run(program);
-            
-            // Pour vérifier que ça marche, on affiche la mémoire à la fin
-            println!("Mémoire finale : {:?}", interpreter.variables);
+            print!("\n");
         }
 
         Err(e) => {

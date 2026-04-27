@@ -1,3 +1,53 @@
+macro_rules! expect_token {
+    ($parser:expr, $pattern:pat => $value:expr, $err_msg:expr) => {
+        match &$parser.current_token {
+            $pattern => { 
+                let result = $value;
+                $parser.advance();
+                result
+            }
+            _ => return Err(SyntaxError {
+                message: $err_msg,
+                line: $parser.lexer.line,
+            }),
+        }
+    };
+
+    ($parser:expr, $token:path) => {
+        if $parser.current_token == $token {
+            $parser.advance();
+        } else {
+            return Err(SyntaxError {
+                message: format!("Syntax Error: Expected {:?}, found {:?}", $token, $parser.current_token),
+                line: $parser.lexer.line,
+            });
+        }
+    };
+}
+
+macro_rules! parse_atom {
+    ($parser:expr) => {
+        match &$parser.current_token {
+            Token::Integer(n) => {
+                let val = n.clone();
+                $parser.advance();
+                Expr::Integer(val)
+            }
+
+            Token::Identifier(name) => {
+                let var_name = name.clone();
+                $parser.advance();
+                Expr::Variable(var_name)
+            }
+
+            _ => return Err(SyntaxError {
+                message: format!("Unknown expression: {:?}", $parser.current_token),
+                line: $parser.lexer.line,
+            }),
+        }
+    };
+}
+
 use crate::token::Token;
 use crate::lexer::Lexer;
 
@@ -74,21 +124,13 @@ impl Parser {
     fn parse_var_declaration(&mut self) -> Result<Stmt, SyntaxError> {
         self.advance();
 
-        let name = match &self.current_token {
-            Token::Identifier(n) => n.clone(),
-            _ => return Err(SyntaxError {
-                message: "Expected variable name after 'var'".to_string(),
-                line: self.lexer.line,
-            }),
-        };
+        let name = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
 
-        self.advance();
+        expect_token!(self, Token::Assign);
 
-        self.expect(Token::Assign)?;
+        let value = parse_atom!(self);
 
-        let value = self.parse_expression()?;
-
-        self.expect(Token::Semicolon)?;
+        expect_token!(self, Token::Semicolon);
 
         Ok(Stmt::VarDeclaration { name, value })
     }
@@ -96,48 +138,15 @@ impl Parser {
     fn parse_print(&mut self) -> Result<Stmt, SyntaxError> {
         self.advance();
 
-        self.expect(Token::LeftBracket)?;
+        expect_token!(self, Token::LeftBracket);
 
-        let value = self.parse_expression()?;
+        let value = parse_atom!(self);
 
-        self.expect(Token::RightBracket)?;
+        expect_token!(self, Token::RightBracket);
         
-        self.expect(Token::Semicolon)?;
+        expect_token!(self, Token::Semicolon);
 
         Ok(Stmt::Print { value })
-    }
-
-    fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {
-        match &self.current_token {
-            Token::Integer(n) => {
-                let val = *n;
-                self.advance();
-                Ok(Expr::Integer(val))
-            }
-
-            Token::Identifier(name) => {
-                let var_name = name.clone();
-                self.advance();
-                Ok(Expr::Variable(var_name))
-            }
-
-            _ => Err(SyntaxError {
-                message: format!("Unknown expression: {:?}", self.current_token),
-                line: self.lexer.line,
-            }),
-        }
-    }
-
-    fn expect(&mut self, expected: Token) -> Result<(), SyntaxError> {
-        if self.current_token == expected {
-            self.advance();
-            Ok(())
-        } else {
-            return Err(SyntaxError {
-                message: format!("Syntax Error: Expected {:?}, found {:?}", expected, self.current_token),
-                line: self.lexer.line,
-            });
-        }
     }
 
     fn advance(&mut self) {
