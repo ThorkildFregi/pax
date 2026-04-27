@@ -3,24 +3,38 @@ mod lexer;
 mod parser;
 mod interpreter;
 
+use std::env;
+use std::fs;
+use std::process;
+
 use lexer::Lexer;
 use parser::Parser;
 use interpreter::Interpreter;
 
 fn main() {
-    let source = "
-        var alpha = 10;
-        var beta = alpha;
-        print(alpha);
-        print(beta);
-    ";
+    let args: Vec<String> = env::args().collect();
 
-    println!("--- Source Code ---");
-    println!("{}", source);
-    println!("-------------------");
+    if args.len() < 2 {
+        println!("Usage: pax <filename.pax>");
+        process::exit(1);
+    }
 
+    let filename = &args[1];
+
+    if !filename.ends_with(".pax") {
+        println!("Warning: Running a file without .pax extension");
+    }
+
+    let source = fs::read_to_string(filename).unwrap_or_else(|err| {
+        println!("Error reading file '{}': {}", filename, err);
+        process::exit(1);
+    });
+
+    run_compiler(source);
+}
+
+fn run_compiler(source: String) {
     let lexer = Lexer::new(source.to_string());
-
     let mut parser = Parser::new(lexer);
 
     match parser.parse_program() {
