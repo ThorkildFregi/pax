@@ -2,7 +2,7 @@ use crate::token::Token;
 use crate::lexer::Lexer;
 
 #[derive(Debug)]
-enum Expr {
+pub enum Expr {
     Integer(i64),
 
     Variable(String),

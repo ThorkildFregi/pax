@@ -1,0 +1,34 @@
+use std::collections::HashMap;
+use crate::parser::{Program, Stmt, Expr};
+
+pub struct Interpreter {
+    pub variables: HashMap<String, i64>,
+}
+
+impl Interpreter {
+    pub fn new() -> Self {
+        Self {
+            variables: HashMap::new(),
+        }
+    }
+
+    pub fn run(&mut self, program: Program) {
+        for stmt in program.statements {
+            match stmt {
+                Stmt::VarDeclaration { name, value } => {
+                    let result = self.evaluate(value);
+                    self.variables.insert(name, result);
+                }
+            }
+        }
+    }
+
+    fn evaluate(&self, expr: Expr) -> i64 {
+        match expr {
+            Expr::Integer(n) => n,
+            Expr::Variable(name) => {
+                *self.variables.get(&name).expect("Variable not found")
+            }
+        }
+    }
+}

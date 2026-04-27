@@ -1,9 +1,11 @@
 mod token;
 mod lexer;
 mod parser;
+mod interpreter;
 
 use lexer::Lexer;
 use parser::Parser;
+use interpreter::Interpreter;
 
 fn main() {
     let source = "
@@ -21,11 +23,11 @@ fn main() {
 
     match parser.parse_program() {
         Ok(program) => {
-            println!("Parsing achieved ! Here is the AST :");
-
-            for (i, stmt) in program.statements.iter().enumerate() {
-                println!("Instruction {}: {:?}", i + 1, stmt);
-            }
+            let mut interpreter = Interpreter::new();
+            interpreter.run(program);
+            
+            // Pour vérifier que ça marche, on affiche la mémoire à la fin
+            println!("Mémoire finale : {:?}", interpreter.variables);
         }
 
         Err(e) => {
