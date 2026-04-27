@@ -2,6 +2,7 @@
 pub enum Token {
     KeywordVar,
     KeywordPrint,
+    KeywordPrintln,
     
     LeftBracket,
     RightBracket,

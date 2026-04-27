@@ -48,6 +48,24 @@ macro_rules! parse_atom {
     };
 }
 
+macro_rules! parse_print {
+    ($parser:expr, $type:ident) => {
+       {
+            $parser.advance();
+
+            expect_token!($parser, Token::LeftBracket);
+
+            let value = parse_atom!($parser);
+
+            expect_token!($parser, Token::RightBracket);
+            
+            expect_token!($parser, Token::Semicolon);
+
+            Ok(Stmt::$type { value })
+        }
+    };
+}
+
 use crate::token::Token;
 use crate::lexer::Lexer;
 
@@ -71,6 +89,9 @@ pub enum Stmt {
         value: Expr,
     },
     Print {
+        value: Expr,
+    },
+    Println {
         value: Expr,
     },
 }
@@ -112,7 +133,8 @@ impl Parser {
             }),
 
             Token::KeywordVar => self.parse_var_declaration(),
-            Token::KeywordPrint => self.parse_print(),
+            Token::KeywordPrint => parse_print!(self, Print),
+            Token::KeywordPrintln => parse_print!(self, Println),
 
             _ => Err(SyntaxError {
                 message: format!("Unexpected token: {:?}", self.current_token),
@@ -133,20 +155,6 @@ impl Parser {
         expect_token!(self, Token::Semicolon);
 
         Ok(Stmt::VarDeclaration { name, value })
-    }
-
-    fn parse_print(&mut self) -> Result<Stmt, SyntaxError> {
-        self.advance();
-
-        expect_token!(self, Token::LeftBracket);
-
-        let value = parse_atom!(self);
-
-        expect_token!(self, Token::RightBracket);
-        
-        expect_token!(self, Token::Semicolon);
-
-        Ok(Stmt::Print { value })
     }
 
     fn advance(&mut self) {

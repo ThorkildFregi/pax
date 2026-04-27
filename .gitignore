@@ -26,3 +26,5 @@ rustc-ice-*.txt
 # Added by cargo
 
 /target
+
+test.pax

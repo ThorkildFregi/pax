@@ -24,6 +24,11 @@ impl Interpreter {
                     let result = self.evaluate(value);
                     print!("{}", result);
                 }
+
+                Stmt::Println { value } => {
+                    let result = self.evaluate(value);
+                    println!("{}", result);
+                }
             }
         }
     }

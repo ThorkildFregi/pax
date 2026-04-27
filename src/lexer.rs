@@ -96,6 +96,7 @@ impl Lexer {
                 match value.as_str() {
                     "var" => Token::KeywordVar,
                     "print" => Token::KeywordPrint,
+                    "println" => Token::KeywordPrintln,
                     _ => Token::Identifier(value),
                 }
             }
