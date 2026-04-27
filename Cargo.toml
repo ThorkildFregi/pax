@@ -1,0 +1,13 @@
+[package]
+name = "pax"
+version = "0.1.0"
+authors=["Gabriel Bermes--Poupeau"]
+edition="2024"
+description = "A lightning-fast, memory-safe language for data science and statistics, built from the ground up with Rust."
+readme = "README.md"
+repository = "https://github.com/ThorkildFregi/pax"
+license = "MIT"
+keywords = ["langage", "mathematics", "statistics"]
+
+[dependencies]
+rand = "0.8.5"
