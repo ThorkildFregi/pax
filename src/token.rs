@@ -1,7 +1,7 @@
 #[derive(Debug, PartialEq, Clone)]
-enum Tokens {
+pub enum Token {
     KeywordVar,
-    
+
     Identifier(String),
     Integer(i64),
 
@@ -9,4 +9,6 @@ enum Tokens {
 
     Semicolon,
     EOF,
+
+    Error(String),
 }
