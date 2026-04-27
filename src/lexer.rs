@@ -45,6 +45,14 @@ impl Lexer {
                         self.pos += 1;
                         return Token::Assign;
                     }
+                    '(' => {
+                        self.pos += 1;
+                        return Token::LeftBracket;
+                    }
+                    ')' => {
+                        self.pos += 1;
+                        return Token::RightBracket;
+                    }
                     ';' => {
                         self.pos += 1;
                         return Token::Semicolon;
@@ -87,6 +95,7 @@ impl Lexer {
             1 => {
                 match value.as_str() {
                     "var" => Token::KeywordVar,
+                    "print" => Token::KeywordPrint,
                     _ => Token::Identifier(value),
                 }
             }

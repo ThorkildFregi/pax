@@ -11,6 +11,8 @@ fn main() {
     let source = "
         var alpha = 10;
         var beta = alpha;
+        print(alpha);
+        print(beta);
     ";
 
     println!("--- Source Code ---");

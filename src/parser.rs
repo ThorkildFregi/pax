@@ -20,6 +20,9 @@ pub enum Stmt {
         name: String,
         value: Expr,
     },
+    Print {
+        value: Expr,
+    },
 }
 
 pub struct Program {
@@ -59,6 +62,7 @@ impl Parser {
             }),
 
             Token::KeywordVar => self.parse_var_declaration(),
+            Token::KeywordPrint => self.parse_print(),
 
             _ => Err(SyntaxError {
                 message: format!("Unexpected token: {:?}", self.current_token),
@@ -87,6 +91,20 @@ impl Parser {
         self.expect(Token::Semicolon)?;
 
         Ok(Stmt::VarDeclaration { name, value })
+    }
+
+    fn parse_print(&mut self) -> Result<Stmt, SyntaxError> {
+        self.advance();
+
+        self.expect(Token::LeftBracket)?;
+
+        let value = self.parse_expression()?;
+
+        self.expect(Token::RightBracket)?;
+        
+        self.expect(Token::Semicolon)?;
+
+        Ok(Stmt::Print { value })
     }
 
     fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {

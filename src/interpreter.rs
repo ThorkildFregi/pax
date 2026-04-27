@@ -19,6 +19,11 @@ impl Interpreter {
                     let result = self.evaluate(value);
                     self.variables.insert(name, result);
                 }
+
+                Stmt::Print { value } => {
+                    let result = self.evaluate(value);
+                    print!("{}", result);
+                }
             }
         }
     }
