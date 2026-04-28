@@ -61,6 +61,18 @@ impl Lexer {
                         self.pos += 1;
                         return Token::Minus;
                     }
+                    '*' => {
+                        self.pos += 1;
+                        return Token::Star;
+                    }
+                    '/' => {
+                        self.pos += 1;
+                        return Token::Slash;
+                    }
+                    '^' => {
+                        self.pos += 1;
+                        return Token::Caret;
+                    }
                     ';' => {
                         self.pos += 1;
                         return Token::Semicolon;

@@ -25,29 +25,6 @@ macro_rules! expect_token {
     };
 }
 
-macro_rules! parse_atom {
-    ($parser:expr) => {
-        match &$parser.current_token {
-            Token::Integer(n) => {
-                let val = n.clone();
-                $parser.advance();
-                Expr::Integer(val)
-            }
-
-            Token::Identifier(name) => {
-                let var_name = name.clone();
-                $parser.advance();
-                Expr::Variable(var_name)
-            }
-
-            _ => return Err(SyntaxError {
-                message: format!("Unknown expression: {:?}", $parser.current_token),
-                line: $parser.lexer.line,
-            }),
-        }
-    };
-}
-
 macro_rules! parse_print {
     ($parser:expr, $type:ident) => {
        {
@@ -62,6 +39,30 @@ macro_rules! parse_print {
             expect_token!($parser, Token::Semicolon);
 
             Ok(Stmt::$type { value })
+        }
+    };
+}
+
+macro_rules! parse_math_op {
+    ($parser:expr, $next_method:ident, $conditions:expr) => {
+        {
+            let mut left = $parser.$next_method()?;
+
+            while $conditions {
+                let operator = $parser.current_token.clone();
+
+                $parser.advance();
+
+                let right = $parser.$next_method()?;
+
+                left = Expr::Binary {
+                    left: Box::new(left),
+                    operator,
+                    right: Box::new(right),
+                };
+            }
+
+            left
         }
     };
 }
@@ -132,22 +133,36 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {
-        let mut left = parse_atom!(self);
+        Ok(parse_math_op!(self, parse_multiplication, self.current_token == Token::Plus || self.current_token == Token::Minus))
+    }
 
-        while self.current_token == Token::Plus || self.current_token == Token::Minus {
-            let operator = self.current_token.clone();
-            self.advance();
+    fn parse_multiplication(&mut self) -> Result<Expr, SyntaxError> {
+        Ok(parse_math_op!(self, parse_power, self.current_token == Token::Star || self.current_token == Token::Slash))
+    }
 
-            let right = parse_atom!(self);
+    fn parse_power(&mut self) -> Result<Expr, SyntaxError> {
+        Ok(parse_math_op!(self, parse_atom, self.current_token == Token::Caret))
+    }
 
-            left = Expr::Binary {
-                left: Box::new(left),
-                operator,
-                right: Box::new(right),
-            };
+    fn parse_atom(&mut self) -> Result<Expr, SyntaxError> {
+        match &self.current_token {
+            Token::Integer(n) => {
+                let val = n.clone();
+                self.advance();
+                Ok(Expr::Integer(val))
+            }
+
+            Token::Identifier(name) => {
+                let var_name = name.clone();
+                self.advance();
+                Ok(Expr::Variable(var_name))
+            }
+
+            _ => Err(SyntaxError {
+                message: format!("Unknown expression: {:?}", self.current_token),
+                line: self.lexer.line,
+            }),
         }
-
-        Ok(left)
     }
 
     fn parse_statement(&mut self) -> Result<Stmt, SyntaxError> {

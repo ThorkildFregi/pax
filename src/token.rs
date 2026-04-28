@@ -14,6 +14,9 @@ pub enum Token {
 
     Plus,
     Minus,
+    Star,
+    Slash,
+    Caret,
 
     Semicolon,
     EOF,

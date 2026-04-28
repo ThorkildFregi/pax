@@ -48,6 +48,9 @@ impl Interpreter {
                 match operator {
                     Token::Plus => l + r,
                     Token::Minus => l - r,
+                    Token::Star => l * r,
+                    Token::Slash => l / r,
+                    Token::Caret => l.pow(r as u32),
                     _ => panic!("Operator not supported"),
                 }
             }
