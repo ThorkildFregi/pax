@@ -97,6 +97,11 @@ pub enum Stmt {
         name: String,
         value: Expr,
     },
+    VarChange {
+        name: String,
+        value: Expr,
+    },
+
     Print {
         value: Expr,
     },
@@ -215,7 +220,9 @@ impl Parser {
                 line: self.lexer.line,
             }),
 
-            Token::KeywordVar => self.parse_var_declaration(),
+            Token::KeywordVar => self.parse_var(true),
+            Token::Identifier(_) => self.parse_var(false),
+
             Token::KeywordPrint => parse_print!(self, Print),
             Token::KeywordPrintln => parse_print!(self, Println),
 
@@ -226,8 +233,8 @@ impl Parser {
         }
     }
 
-    fn parse_var_declaration(&mut self) -> Result<Stmt, SyntaxError> {
-        self.advance();
+    fn parse_var(&mut self, is_declaration: bool) -> Result<Stmt, SyntaxError> {
+        if is_declaration {self.advance();}
 
         let name = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
 
@@ -237,7 +244,11 @@ impl Parser {
 
         expect_token!(self, Token::Semicolon);
 
-        Ok(Stmt::VarDeclaration { name, value })
+        if is_declaration {
+            Ok(Stmt::VarDeclaration { name, value }) 
+        } else {
+            Ok(Stmt::VarChange { name, value })
+        }
     }
 
     fn advance(&mut self) {

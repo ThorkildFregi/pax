@@ -30,6 +30,23 @@ impl Interpreter {
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
                     }
                 }
+                Stmt::VarChange { name, value } => {
+                    match self.evaluate(value) {
+                        Ok(new_val) => {
+                            if let Some(old_val) = self.variables.get(&name) {
+                                if std::mem::discriminant(old_val) == std::mem::discriminant(&new_val) {
+                                    self.variables.insert(name, new_val);
+                                } else {
+                                    eprintln!("TypeError: Variable '{}' must remain of the same type", name);
+                                }
+                            } else {
+                                eprintln!("Runtime Error: Variable '{}' not declared. Use 'var' first.", name);
+                            }
+                        },
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    }
+                }
+
                 Stmt::Print { value } => {
                     match self.evaluate(value) {
                         Ok(res) => print!("{}", res), // Utilise le Display de Value
