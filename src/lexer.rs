@@ -53,6 +53,10 @@ impl Lexer {
                         self.pos += 1;
                         return Token::RightBracket;
                     }
+                    '"' => {
+                        self.state = 3;
+                        self.pos += 1;
+                    }
                     '+' => {
                         self.pos += 1;
                         return Token::Plus;
@@ -102,6 +106,16 @@ impl Lexer {
                     }
                     _ => break,
                 }
+                3 => match ch {
+                    '"' => {
+                        self.pos += 1;
+                        break;
+                    }
+                    _ => {
+                        value.push(ch);
+                        self.pos += 1;
+                    }
+                }
                 _ => return Token::Error(format!("Unknown state {}", self.state)),
             }
         }
@@ -123,6 +137,10 @@ impl Lexer {
             2 => {
                 let n = value.parse::<i64>().expect("Failed to parse integer");
                 return Token::Integer(n);
+            }
+            3 => {
+                let string = value;
+                return Token::String(string);
             }
             _ => return Token::Error(format!("Unknown state {}", self.state)),
         }

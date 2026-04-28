@@ -6,9 +6,12 @@ pub enum Token {
     
     LeftBracket,
     RightBracket,
-
+    
     Identifier(String),
+
     Integer(i64),
+
+    String(String),
 
     Assign,
 

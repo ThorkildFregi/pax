@@ -74,6 +74,8 @@ use crate::lexer::Lexer;
 pub enum Expr {
     Integer(i64),
 
+    String(String),
+
     Variable(String),
 
     Binary {
@@ -133,7 +135,42 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {
-        Ok(parse_math_op!(self, parse_multiplication, self.current_token == Token::Plus || self.current_token == Token::Minus))
+        let mut left = if matches!(self.current_token, Token::String(_)) {
+            self.parse_atom()?
+        } else {
+            self.parse_multiplication()?
+        };
+
+        while matches!(self.current_token, Token::Plus) || matches!(self.current_token, Token::Minus) {
+            if matches!(left, Expr::String(_)) && matches!(self.current_token, Token::Minus) {
+                return Err(SyntaxError {
+                    message: "TypeError: Cannot use '-' operator with Strings".to_string(),
+                    line: self.lexer.line,
+                });
+            }
+
+            let operator = self.current_token.clone();
+            self.advance();
+
+            let right = if matches!(left, Expr::String(_)) && matches!(self.current_token, Token::String(_)) {
+                self.parse_atom()?
+            } else if matches!(left, Expr::String(_)) && !matches!(self.current_token, Token::String(_)) {
+                return Err(SyntaxError {
+                    message: format!("TypeError: cannot add {:?} and 'String'", self.current_token),
+                    line: self.lexer.line,
+                });
+            } else {
+                self.parse_multiplication()?
+            };
+
+            left = Expr::Binary {
+                left: Box::new(left),
+                operator,
+                right: Box::new(right),
+            };
+        }
+
+        Ok(left)
     }
 
     fn parse_multiplication(&mut self) -> Result<Expr, SyntaxError> {
@@ -156,6 +193,12 @@ impl Parser {
                 let var_name = name.clone();
                 self.advance();
                 Ok(Expr::Variable(var_name))
+            }
+
+            Token::String(string) => {
+                let string = string.clone();
+                self.advance();
+                Ok(Expr::String(string))
             }
 
             _ => Err(SyntaxError {

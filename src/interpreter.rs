@@ -3,8 +3,15 @@ use std::collections::HashMap;
 use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
 
+#[derive(Debug, Clone)]
+pub enum Value {
+    Integer(i64),
+
+    String(String),
+}
+
 pub struct Interpreter {
-    pub variables: HashMap<String, i64>,
+    pub variables: HashMap<String, Value>,
 }
 
 impl Interpreter {
@@ -18,42 +25,72 @@ impl Interpreter {
         for stmt in program.statements {
             match stmt {
                 Stmt::VarDeclaration { name, value } => {
-                    let result = self.evaluate(value);
-                    self.variables.insert(name, result);
+                    match self.evaluate(value) {
+                        Ok(res) => { self.variables.insert(name, res); },
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    }
                 }
-
                 Stmt::Print { value } => {
-                    let result = self.evaluate(value);
-                    print!("{}", result);
+                    match self.evaluate(value) {
+                        Ok(res) => print!("{}", res), // Utilise le Display de Value
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    }
                 }
-
                 Stmt::Println { value } => {
-                    let result = self.evaluate(value);
-                    println!("{}", result);
+                    match self.evaluate(value) {
+                        Ok(res) => println!("{}", res),
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    }
                 }
             }
         }
     }
 
-    fn evaluate(&self, expr: Expr) -> i64 {
+    fn evaluate(&self, expr: Expr) -> Result<Value, String> {
         match expr {
-            Expr::Integer(n) => n,
+            Expr::Integer(n) => Ok(Value::Integer(n)),
             Expr::Variable(name) => {
-                *self.variables.get(&name).expect("Variable not found")
+                self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name))
             }
+            Expr::String(string) => Ok(Value::String(string)),
             Expr::Binary {left, operator, right} => {
-                let l = self.evaluate(*left);
-                let r = self.evaluate(*right);
+                let l = self.evaluate(*left)?;
+                let r = self.evaluate(*right)?;
 
                 match operator {
-                    Token::Plus => l + r,
-                    Token::Minus => l - r,
-                    Token::Star => l * r,
-                    Token::Slash => l / r,
-                    Token::Caret => l.pow(r as u32),
-                    _ => panic!("Operator not supported"),
+                    Token::Plus => match (l.clone(), r.clone()) {
+                        (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a + b)),
+                        (Value::String(a), Value::String(b)) => Ok(Value::String(format!("{}{}", a, b))),
+                        _ => Err(format!("TypeError: cannot add '{:?}' and '{:?}'", l, r)),
+                    },
+                    Token::Minus => match (l.clone(), r.clone()) {
+                        (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a - b)),
+                        _ => Err("TypeError: Cannot use '-' operator with Strings".into()),
+                    },
+                    Token::Star => match (l.clone(), r.clone()) {
+                        (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a * b)),
+                        _ => Err(format!("TypeError: cannot multiply '{:?}' and '{:?}'", l, r))
+                    },
+                    Token::Slash => match (l.clone(), r.clone()) {
+                        (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a / b)),
+                        _ => Err(format!("TypeError: cannot divide '{:?}' and '{:?}'", l, r))
+                    },
+                    Token::Caret => match (l.clone(), r.clone()) {
+                        (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a.pow(b as u32))),
+                        _ => Err(format!("TypeError: cannot power '{:?}' and '{:?}'", l, r))
+                    },
+                    _ => Err("Operator not supported".into()),
                 }
             }
+        }
+    }
+}
+
+impl std::fmt::Display for Value {
+    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            Value::Integer(n) => write!(f, "{}", n),
+            Value::String(s) => write!(f, "{}", s),
         }
     }
 }
