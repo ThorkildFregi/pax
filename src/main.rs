@@ -15,6 +15,11 @@ use interpreter::Interpreter;
 fn main() {
     let args: Vec<String> = env::args().collect();
 
+    if args.contains(&"--version".to_string()) || args.contains(&"-v".to_string()) {
+        println!("Pax Language v{}", env!("CARGO_PKG_VERSION"));
+        return;
+    }
+
     if args.len() < 2 {
         println!("Usage: pax <filename.pax>");
         process::exit(1);
