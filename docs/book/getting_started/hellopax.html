@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-fff090e8.js";
+            window.path_to_searchindex_js = "../searchindex-3a8c518e.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-6074132a.js"></script>
@@ -183,13 +183,27 @@
                         <h1 id="hello-pax"><a class="header" href="#hello-pax">Hello Pax!</a></h1>
 <p>Your journey begins in Middle-earth, during the Third Age. Your goal: defeat Sauron. To do that, we’re going to write our very first Pax program!</p>
 <h2 id="terminal-tools"><a class="header" href="#terminal-tools">Terminal tools</a></h2>
-<p>For all terminal command line, we’re gonna use <code>bash</code>, so, if you’re Windows I recommend to use PowerShell or WSL with Linux.</p>
+<p>For all terminal commands, we are going to use <code>bash</code>. If you are on Windows, I recommend using PowerShell or WSL (Windows Subsystem for Linux).</p>
 <h2 id="project-directory-setup"><a class="header" href="#project-directory-setup">Project Directory Setup</a></h2>
 <p>Listen carefully: as I already said before, if you write messy code in your <code>home</code> folder, I don’t care, it is none of my bussiness. we are going to take a clean approach. First, we will create our project directory.</p>
 <p>Note: You should start by creating a dedicated folder for all your programming projects.</p>
 <pre><code class="language-bash">$ mkdir journey_middle_earth
 $ cd journey_middle_earth
 </code></pre>
+<h2 id="pax-program-basics"><a class="header" href="#pax-program-basics">Pax Program Basics</a></h2>
+<p>Next, create a source file and name it <code>journey.pax</code>. Pax files can technically end with any extension you like; however, if you don’t use <code>.pax</code>, you will be issued a warning. If you use more than one word in your filename, the convention is to use underscores to separate them. For example, use <code>hello_world.pax</code> instead of <code>helloWorld.pax</code>.</p>
+<p>Now open <code>journey.pax</code> and type:</p>
+<pre><code class="language-pax">var msg = "I defeated Sauron";
+
+print(msg);
+</code></pre>
+<p>To run it, go back to your terminal and type:</p>
+<pre><code class="language-bash">$ pax journey.pax
+</code></pre>
+<p>You should see:</p>
+<pre><code class="language-bash">I defeated Sauron !
+</code></pre>
+<h2 id="the-explanation-of-this-journey"><a class="header" href="#the-explanation-of-this-journey">The explanation of this journey</a></h2>
 
                     </main>
 

@@ -4,7 +4,7 @@ Your journey begins in Middle-earth, during the Third Age. Your goal: defeat Sau
 
 ## Terminal tools
 
-For all terminal command line, we're gonna use ```bash```, so, if you're Windows I recommend to use PowerShell or WSL with Linux.
+For all terminal commands, we are going to use ```bash```. If you are on Windows, I recommend using PowerShell or WSL (Windows Subsystem for Linux).
 
 ## Project Directory Setup
 
@@ -16,3 +16,29 @@ Note: You should start by creating a dedicated folder for all your programming p
 $ mkdir journey_middle_earth
 $ cd journey_middle_earth
 ```
+
+## Pax Program Basics
+
+Next, create a source file and name it ```journey.pax```. Pax files can technically end with any extension you like; however, if you don't use ````.pax````, you will be issued a warning. If you use more than one word in your filename, the convention is to use underscores to separate them. For example, use ```hello_world.pax``` instead of ```helloWorld.pax```.
+
+Now open ```journey.pax``` and type:
+
+```pax
+var msg = "I defeated Sauron";
+
+print(msg);
+```
+
+To run it, go back to your terminal and type:
+
+```bash
+$ pax journey.pax
+```
+
+You should see:
+
+```bash
+I defeated Sauron !
+```
+
+## The explanation of this journey
