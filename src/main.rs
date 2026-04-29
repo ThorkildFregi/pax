@@ -3,10 +3,11 @@ mod lexer;
 mod parser;
 mod interpreter;
 
-use std::env;
 use std::fs;
+use std::env;
 use std::process;
 
+use token::Token;
 use lexer::Lexer;
 use parser::Parser;
 use interpreter::Interpreter;
@@ -37,7 +38,7 @@ fn run_compiler(source: String) {
     let lexer = Lexer::new(source.to_string());
     let mut parser = Parser::new(lexer);
 
-    match parser.parse_program() {
+    match parser.parse_program(Token::EOF) {
         Ok(program) => {
             let mut interpreter = Interpreter::new();
             interpreter.run(program);

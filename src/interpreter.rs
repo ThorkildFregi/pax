@@ -62,9 +62,36 @@ impl Interpreter {
                     }
                 }
 
+                Stmt::ConditionChain { conditions, else_condition } => {
+                    let mut executed = false;
+
+                    for cond in conditions {
+                        match self.evaluate(cond.condition) {
+                            Ok(res) => {
+                                if let Value::Boolean(b) = res {
+                                    if b {
+                                        self.run(cond.program);
+                                        executed = true; 
+                                        break;
+                                    }
+                                } else {
+                                    eprintln!("Runtime Error: Condition must be a Boolean");
+                                    return;
+                                }
+                            }
+                            Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                        }
+                    }
+                    if !executed {
+                        if let Some(prog) = else_condition {
+                            self.run(prog);
+                        }
+                    }
+                }
+
                 Stmt::Print { value } => {
                     match self.evaluate(value) {
-                        Ok(res) => print!("{}", res), // Utilise le Display de Value
+                        Ok(res) => print!("{}", res),
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
                     }
                 }

@@ -94,6 +94,12 @@ pub struct SyntaxError {
 }
 
 #[derive(Debug)]
+pub struct Condition {
+    pub condition: Expr,
+    pub program: Program,
+}
+
+#[derive(Debug)]
 pub enum Stmt {
     VarDeclaration {
         name: String,
@@ -105,6 +111,11 @@ pub enum Stmt {
         value: Expr,
     },
 
+    ConditionChain {
+        conditions: Vec<Condition>,
+        else_condition: Option<Program>,
+    },
+
     Print {
         value: Expr,
     },
@@ -113,6 +124,7 @@ pub enum Stmt {
     },
 }
 
+#[derive(Debug)]
 pub struct Program {
     pub statements: Vec<Stmt>,
 }
@@ -131,10 +143,10 @@ impl Parser {
         }
     }
 
-    pub fn parse_program(&mut self) -> Result<Program, SyntaxError> {
+    pub fn parse_program(&mut self, end_token: Token) -> Result<Program, SyntaxError> {
         let mut program = Program { statements: Vec::new() };
 
-        while self.current_token != Token::EOF {
+        while self.current_token != end_token {
             let stmt = self.parse_statement()?;
             program.statements.push(stmt);
         }
@@ -204,6 +216,8 @@ impl Parser {
             Token::KeywordPrint => parse_print!(self, Print),
             Token::KeywordPrintln => parse_print!(self, Println),
 
+            Token::KeywordIf => self.parse_condition(),
+
             _ => Err(SyntaxError {
                 message: format!("Unexpected token: {:?}", self.current_token),
                 line: self.lexer.line,
@@ -236,6 +250,41 @@ impl Parser {
         } else {
             Ok(Stmt::VarChange { name, value })
         }
+    }
+
+    fn parse_condition(&mut self) -> Result<Stmt, SyntaxError> {
+        let mut conditions = Vec::new();
+        let mut else_condition = None;
+
+        while self.current_token == Token::KeywordIf || self.current_token == Token::KeywordElif {
+            self.advance();
+
+            expect_token!(self, Token::LeftBracket);
+            let condition = self.parse_expression()?;
+            expect_token!(self, Token::RightBracket);
+
+            expect_token!(self, Token::LeftCurlyBracket);
+
+            let program = self.parse_program(Token::RightCurlyBracket)?;
+
+            self.advance();
+
+            conditions.push(Condition { condition, program });
+        }
+
+        if self.current_token == Token::KeywordElse {
+            self.advance();
+
+            expect_token!(self, Token::LeftCurlyBracket);
+
+            let else_program = self.parse_program(Token::RightCurlyBracket)?;
+
+            self.advance();
+
+            else_condition = Some(else_program);
+        }
+
+        Ok(Stmt::ConditionChain { conditions, else_condition })
     }
 
     fn advance(&mut self) {
