@@ -67,11 +67,11 @@ impl Lexer {
                     }
                     '&' => {
                         self.pos += 1;
-                        return Token::Or;
+                        return Token::And;
                     }
                     '|' => {
                         self.pos += 1;
-                        return Token::And;
+                        return Token::Or;
                     }
                     '"' => {
                         self.state = 3;
