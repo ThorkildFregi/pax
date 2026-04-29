@@ -1,6 +1,8 @@
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
     KeywordVar,
+    KeywordConst,
+
     KeywordPrint,
     KeywordPrintln,
     

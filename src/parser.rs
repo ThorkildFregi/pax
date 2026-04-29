@@ -96,6 +96,7 @@ pub enum Stmt {
     VarDeclaration {
         name: String,
         value: Expr,
+        is_constant: bool,
     },
     VarChange {
         name: String,
@@ -234,7 +235,16 @@ impl Parser {
     }
 
     fn parse_var(&mut self, is_declaration: bool) -> Result<Stmt, SyntaxError> {
-        if is_declaration {self.advance();}
+        let mut is_constant = false;
+        
+        if is_declaration {
+            self.advance();
+
+            if self.current_token == Token::KeywordConst {
+                is_constant = true;
+                self.advance();
+            }
+        }
 
         let name = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
 
@@ -245,7 +255,7 @@ impl Parser {
         expect_token!(self, Token::Semicolon);
 
         if is_declaration {
-            Ok(Stmt::VarDeclaration { name, value }) 
+            Ok(Stmt::VarDeclaration { name, value, is_constant }) 
         } else {
             Ok(Stmt::VarChange { name, value })
         }

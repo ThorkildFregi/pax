@@ -10,8 +10,14 @@ pub enum Value {
     String(String),
 }
 
+#[derive(Clone)]
+struct VariableSlot {
+    value: Value,
+    is_constant: bool,
+}
+
 pub struct Interpreter {
-    pub variables: HashMap<String, Value>,
+    variables: HashMap<String, VariableSlot>,
 }
 
 impl Interpreter {
@@ -24,23 +30,30 @@ impl Interpreter {
     pub fn run(&mut self, program: Program) {
         for stmt in program.statements {
             match stmt {
-                Stmt::VarDeclaration { name, value } => {
+                Stmt::VarDeclaration { name, value, is_constant } => {
                     match self.evaluate(value) {
-                        Ok(res) => { self.variables.insert(name, res); },
+                        Ok(res) => { self.variables.insert(name, VariableSlot { value: res, is_constant }); },
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
                     }
                 }
                 Stmt::VarChange { name, value } => {
                     match self.evaluate(value) {
                         Ok(new_val) => {
-                            if let Some(old_val) = self.variables.get(&name) {
-                                if std::mem::discriminant(old_val) == std::mem::discriminant(&new_val) {
-                                    self.variables.insert(name, new_val);
+                            if let Some(slot) = self.variables.get_mut(&name) {
+                                if slot.is_constant {
+                                    eprintln!("RuntimeError: Can't modify constant variable '{}'", name);
+                                    return;
+                                }
+
+                                if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
+                                    slot.value = new_val;
                                 } else {
                                     eprintln!("TypeError: Variable '{}' must remain of the same type", name);
+                                    return;
                                 }
                             } else {
                                 eprintln!("Runtime Error: Variable '{}' not declared. Use 'var' first.", name);
+                                return;
                             }
                         },
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
@@ -67,7 +80,7 @@ impl Interpreter {
         match expr {
             Expr::Integer(n) => Ok(Value::Integer(n)),
             Expr::Variable(name) => {
-                self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name))
+                Ok(self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name)).unwrap().value)
             }
             Expr::String(string) => Ok(Value::String(string)),
             Expr::Binary {left, operator, right} => {
