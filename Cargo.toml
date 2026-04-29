@@ -12,3 +12,7 @@ keywords = ["langage", "mathematics", "statistics"]
 [[bin]]
 name = "pax"
 path = "src/main.rs"
+
+[dependencies]
+include_dir = "0.7"
+open = "5.1"

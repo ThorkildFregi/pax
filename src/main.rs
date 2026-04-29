@@ -7,17 +7,31 @@ use std::fs;
 use std::env;
 use std::process;
 
+use tempfile::tempdir;
+use include_dir::{include_dir, Dir};
+
 use token::Token;
 use lexer::Lexer;
 use parser::Parser;
 use interpreter::Interpreter;
 
+static DOC_DIR: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/docs/book");
+
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.contains(&"--version".to_string()) || args.contains(&"-v".to_string()) {
-        println!("Pax Language v{}", env!("CARGO_PKG_VERSION"));
-        return;
+    if args.len() > 1 {
+        match args[1].as_str() {
+            "docs" => {
+                open_docs();
+                return;
+            }
+            "--version" | "-v" => {
+                println!("Pax Language v{}", env!("CARGO_PKG_VERSION"));
+                return;
+            }
+            _ => {}
+        }
     }
 
     if args.len() < 2 {
@@ -37,6 +51,24 @@ fn main() {
     });
 
     run_compiler(source);
+}
+
+fn open_docs() {
+    let mut temp_docs = env::temp_dir();
+    temp_docs.push(format!("pax_docs_v{}", env!("CARGO_PKG_VERSION")));
+
+    if !temp_docs.exists() {
+        fs::create_dir_all(&temp_docs).unwrap();
+        DOCS.extract(&temp_docs).expect("Failed to extract embedded documentation");
+    }
+
+    let index_path = temp_docs.join("index.html");
+    println!("Opening local documentation (v{})...", env!("CARGO_PKG_VERSION"));
+    
+    if let Err(_) = open::that(index_path) {
+        eprintln!("Error: Could not open the browser automatically.");
+        eprintln!("You can find the documentation here: {:?}", temp_docs);
+    }
 }
 
 fn run_compiler(source: String) {
