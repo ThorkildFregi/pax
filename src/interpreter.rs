@@ -113,11 +113,33 @@ impl Interpreter {
             }
             Expr::String(string) => Ok(Value::String(string)),
             Expr::Boolean(boolean) => Ok(Value::Boolean(boolean)),
+            Expr::Unary { operator, right } => {
+                let res = self.evaluate(*right)?;
+
+                match operator {
+                    Token::Not => {
+                        if let Value::Boolean(b) = res {
+                            Ok(Value::Boolean(!b))
+                        } else {
+                            Err("TypeError: '!' operator expected a boolean".into())
+                        }
+                    }
+                    _ => Err(format!("Unknown unary operator: {:?}", operator)),
+                }
+            }
             Expr::Binary {left, operator, right} => {
                 let l = self.evaluate(*left)?;
                 let r = self.evaluate(*right)?;
 
                 match operator {
+                    Token::And => match (l.clone(), r.clone()) {
+                        (Value::Boolean(a), Value::Boolean(b)) => Ok(Value::Boolean(a & b)),
+                        _ => Err(format!("TypeError: logical binary operator requires boolean operands, but found '{:?}' and '{:?}'", l, r))
+                    },
+                    Token::Or => match (l.clone(), r.clone()) {
+                        (Value::Boolean(a), Value::Boolean(b)) => Ok(Value::Boolean(a | b)),
+                        _ => Err(format!("TypeError: logical binary operator requires boolean operands, but found '{:?}' and '{:?}'", l, r))
+                    },
                     Token::Equal => Ok(Value::Boolean(l == r)),
                     Token::Different => Ok(Value::Boolean(l != r)),
                     Token::Plus => match (l.clone(), r.clone()) {

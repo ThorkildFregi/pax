@@ -80,6 +80,11 @@ pub enum Expr {
 
     Variable(String),
 
+    Unary {
+        operator: Token,
+        right: Box<Expr>,
+    },
+
     Binary {
         left: Box<Expr>,
         operator: Token,
@@ -155,6 +160,10 @@ impl Parser {
     }
 
     fn parse_expression(&mut self) -> Result<Expr, SyntaxError> {
+        Ok(parse_math_op!(self, parse_equal, self.current_token == Token::And || self.current_token == Token::Or))
+    }
+
+    fn parse_equal(&mut self) -> Result<Expr, SyntaxError> {
         Ok(parse_math_op!(self, parse_addition, self.current_token == Token::Equal || self.current_token == Token::Different))
     }
 
@@ -167,7 +176,23 @@ impl Parser {
     }
 
     fn parse_power(&mut self) -> Result<Expr, SyntaxError> {
-        Ok(parse_math_op!(self, parse_atom, self.current_token == Token::Caret))
+        Ok(parse_math_op!(self, parse_unary, self.current_token == Token::Caret))
+    }
+
+    fn parse_unary(&mut self) -> Result<Expr, SyntaxError> {
+        if self.current_token == Token::Not {
+            let operator = self.current_token.clone();
+            self.advance();
+
+            let right = self.parse_unary()?;
+
+            Ok(Expr::Unary {
+                operator,
+                right: Box::new(right),
+            })
+        } else {
+            self.parse_atom()
+        }
     }
 
     fn parse_atom(&mut self) -> Result<Expr, SyntaxError> {
@@ -259,9 +284,7 @@ impl Parser {
         while self.current_token == Token::KeywordIf || self.current_token == Token::KeywordElif {
             self.advance();
 
-            expect_token!(self, Token::LeftBracket);
             let condition = self.parse_expression()?;
-            expect_token!(self, Token::RightBracket);
 
             expect_token!(self, Token::LeftCurlyBracket);
 

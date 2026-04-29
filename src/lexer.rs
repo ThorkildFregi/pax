@@ -66,12 +66,12 @@ impl Lexer {
                         return Token::RightCurlyBracket;
                     }
                     '&' => {
-                        self.state = 6;
                         self.pos += 1;
+                        return Token::Or;
                     }
                     '|' => {
-                        self.state = 7;
                         self.pos += 1;
+                        return Token::And;
                     }
                     '"' => {
                         self.state = 3;
@@ -150,21 +150,7 @@ impl Lexer {
                         self.pos += 1;
                         return Token::Different;
                     }
-                    _ => return Token::Error(format!("Character '{}' not supported at line {}", ch, self.line)),
-                }
-                6 => match ch {
-                    '&' => {
-                        self.pos += 1;
-                        return Token::Or;
-                    }
-                    _ => return Token::Error(format!("Character '{}' not supported at line {}", ch, self.line)),
-                }
-                7 => match ch {
-                    '|' => {
-                        self.pos += 1;
-                        return Token::And;
-                    }
-                    _ => return Token::Error(format!("Character '{}' not supported at line {}", ch, self.line)),
+                    _ => return Token::Not,
                 }
                 _ => return Token::Error(format!("Unknown state {}", self.state)),
             }
