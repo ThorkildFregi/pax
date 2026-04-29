@@ -3,11 +3,17 @@ pub enum Token {
     KeywordVar,
     KeywordConst,
 
+    KeywordIf,
+    KeywordElif,
+    KeywordElse,
+
     KeywordPrint,
     KeywordPrintln,
     
     LeftBracket,
     RightBracket,
+    LeftCurlyBracket,
+    RightCurlyBracket,
     
     Identifier(String),
 
@@ -15,7 +21,15 @@ pub enum Token {
 
     String(String),
 
+    Boolean(bool),
+
     Assign,
+
+    And,
+    Or,
+
+    Equal,
+    Different,
 
     Plus,
     Minus,

@@ -3,11 +3,13 @@ use std::collections::HashMap;
 use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Integer(i64),
 
     String(String),
+
+    Boolean(bool),
 }
 
 #[derive(Clone)]
@@ -41,14 +43,14 @@ impl Interpreter {
                         Ok(new_val) => {
                             if let Some(slot) = self.variables.get_mut(&name) {
                                 if slot.is_constant {
-                                    eprintln!("RuntimeError: Can't modify constant variable '{}'", name);
+                                    eprintln!("Runtime Error: Can't modify constant variable '{}'", name);
                                     return;
                                 }
 
                                 if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
                                     slot.value = new_val;
                                 } else {
-                                    eprintln!("TypeError: Variable '{}' must remain of the same type", name);
+                                    eprintln!("Runtime Error: TypeError: Variable '{}' must remain of the same type", name);
                                     return;
                                 }
                             } else {
@@ -83,11 +85,14 @@ impl Interpreter {
                 Ok(self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name)).unwrap().value)
             }
             Expr::String(string) => Ok(Value::String(string)),
+            Expr::Boolean(boolean) => Ok(Value::Boolean(boolean)),
             Expr::Binary {left, operator, right} => {
                 let l = self.evaluate(*left)?;
                 let r = self.evaluate(*right)?;
 
                 match operator {
+                    Token::Equal => Ok(Value::Boolean(l == r)),
+                    Token::Different => Ok(Value::Boolean(l != r)),
                     Token::Plus => match (l.clone(), r.clone()) {
                         (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a + b)),
                         (Value::String(a), Value::String(b)) => Ok(Value::String(format!("{}{}", a, b))),
@@ -95,7 +100,7 @@ impl Interpreter {
                     },
                     Token::Minus => match (l.clone(), r.clone()) {
                         (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a - b)),
-                        _ => Err("TypeError: Cannot use '-' operator with Strings".into()),
+                        _ => Err(format!("TypeError: cannot substract '{:?}' and '{:?}'", l, r)),
                     },
                     Token::Star => match (l.clone(), r.clone()) {
                         (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a * b)),
@@ -121,6 +126,7 @@ impl std::fmt::Display for Value {
         match self {
             Value::Integer(n) => write!(f, "{}", n),
             Value::String(s) => write!(f, "{}", s),
+            Value::Boolean(b) => write!(f, "{}", b)
         }
     }
 }
