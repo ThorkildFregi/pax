@@ -1,0 +1,54 @@
+name: Release Compiler
+on:
+  push:
+    tags:
+      - 'v*'
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: pax
+            os_suffix: pax-linux-x64
+          - os: windows-latest
+            artifact_name: pax.exe
+            os_suffix: pax-windows-x64.exe
+          - os: macos-latest
+            artifact_name: pax
+            os_suffix: pax-macos-x64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install mdBook
+        run: |
+          if [ "${{ matrix.os }}" = "windows-latest" ]; then
+            # Installation simplifiée pour Windows
+            curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-pc-windows-msvc.zip -o mdbook.zip
+            tar -xf mdbook.zip
+          else
+            curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-unknown-linux-gnu.tar.gz | tar -xz
+          fi
+          # On s'assure que mdbook est exécutable
+          mv mdbook* ${{ matrix.os == 'windows-latest' && 'mdbook.exe' || 'mdbook' }}
+
+      - name: Build Documentation
+        run: ./mdbook build docs
+
+      - name: Build Pax (Rust)
+        run: cargo build --release
+
+      - name: Upload binaries to release
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: target/release/${{ matrix.artifact_name }}
+          asset_name: pax-${{ github.ref_name }}-${{ matrix.os_suffix }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          tag: ${{ github.ref }}
+          overwrite: true

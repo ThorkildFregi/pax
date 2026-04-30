@@ -1,0 +1,11 @@
+[book]
+title = "Pax : a programming language"
+authors = ["Gabriel Bermes--Poupeau"]
+language = "en"
+src = "src"
+
+[output.html]
+additional-js = ["src/theme/pax-lang.js"]
+
+git-repository-url = "https://github.com/ThorkildFregi/pax"
+edit-url-template = "https://github.com/ThorkildFregi/pax/edit/main/docs/{path}"
