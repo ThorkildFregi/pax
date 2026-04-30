@@ -39,7 +39,9 @@ jobs:
           mv mdbook* ${{ matrix.os == 'windows-latest' && 'mdbook.exe' || 'mdbook' }}
 
       - name: Build Documentation
-        run: ./mdbook build docs
+        run: |
+          chmod +x ./mdbook 
+          ./mdbook build docs
 
       - name: Build Pax (Rust)
         run: cargo build --release
