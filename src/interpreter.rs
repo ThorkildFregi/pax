@@ -70,7 +70,8 @@ impl Interpreter {
                             Ok(res) => {
                                 if let Value::Boolean(b) = res {
                                     if b {
-                                        self.run(cond.program);
+                                        let mut interpreter = Interpreter::new();
+                                        interpreter.run(program);
                                         executed = true; 
                                         break;
                                     }
@@ -84,7 +85,8 @@ impl Interpreter {
                     }
                     if !executed {
                         if let Some(prog) = else_condition {
-                            self.run(prog);
+                            let mut interpreter = Interpreter::new();
+                            interpreter.run(program);
                         }
                     }
                 }
