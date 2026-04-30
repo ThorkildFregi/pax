@@ -49,6 +49,14 @@ impl Lexer {
                         self.state = 5;
                         self.pos += 1;
                     }
+                    '>' => {
+                        self.state = 8;
+                        self.pos += 1;
+                    }
+                    '<' => {
+                        self.state = 9;
+                        self.pos += 1;
+                    }
                     '(' => {
                         self.pos += 1;
                         return Token::LeftBracket;
@@ -165,6 +173,20 @@ impl Lexer {
                         self.pos += 1;
                     }
                     _ => self.pos += 1,
+                }
+                8 => match ch {
+                    '=' => {
+                        self.pos += 1;
+                        return Token::MoreEqual;
+                    }
+                    _ => return Token::More,
+                }
+                9 => match ch {
+                    '=' => {
+                        self.pos += 1;
+                        return Token::LessEqual;
+                    }
+                    _ => return Token::Less,
                 }
                 _ => return Token::Error(format!("Unknown state {}", self.state)),
             }

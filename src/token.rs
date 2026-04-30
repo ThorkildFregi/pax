@@ -31,6 +31,10 @@ pub enum Token {
 
     Equal,
     Different,
+    More,
+    Less,
+    MoreEqual,
+    LessEqual,
 
     Plus,
     Minus,

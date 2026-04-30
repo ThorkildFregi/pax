@@ -10,13 +10,18 @@ To use ```if```, all you need is a boolean.
 
 ### Boolean
 
-I may not have told you everything you need to know about booleans yet, my apologies! In Pax, you have access to four different operations for now (more will be added later). These are split into two categories: comparison operators and logical operators.
+I may not have told you everything you need to know about booleans yet, my apologies! In Pax, you have access to eight different operations for now. These are split into two categories: comparison operators and logical operators.
 
 #### Comparison operators
 
-Comparison operators are used to compare two values, whether they are strings, numbers, booleans, or variables. You have two at your disposal:
+Comparison operators are used to compare two values, whether they are strings, numbers, booleans, or variables. You have six at your disposal:
 - ```==``` : The "Equal to" operator. It checks if two values are the same.
 - ```!=``` : The "Not equal to" operator. It checks if two values are different.
+- ```>```: The "Strictly more" operator. It checks if a value is strictly superior to another.
+- ```<```: The "Strictly less" operator. It checks if a value is striclty inferior to another.
+- ```>=```: The "More or equal" operator. It checks if a value is superior or equal to another.
+- ```<=```: The "Less or equal" operator. It checks if a value is inferior or equal to another.
+
 
 Examples:
 
@@ -26,6 +31,10 @@ var beta = 20;
 
 alpha == beta // Return false
 alpha != beta // Return true
+alpha > beta  // Return false
+alpha < beta  // Return true
+alpha >= beta  // Return false
+alpha <= beta  // Return true
 ```
 
 #### Logical operators
@@ -55,7 +64,7 @@ if alpha == beta | alpha != beta {
 }
 ```
 
-Why will this message be printed? First, ```alpha == beta``` returns ```false```. However, ```alpha != beta``` returns ```true```. Since the operator in the middle is ```|``` (OR), the entire expression evaluates to ```true```. In an ```if``` statement, if the boolean is ```true```, the code inside the curly brackets is executed.
+Why will this message be printed? First, ```alpha == beta``` returns ```false```. However, ```alpha != beta``` returns ```true```. Since the operator in the middle is ```|``` (OR), the entire expression evaluates to ```true```. In an ```if``` statement, if the boolean is ```true```, the code inside the curly brackets is executed. Note that the code inside the curly brackets is a program itself and so has access to his own local variables and not to the other variables.
 
 Note: Pax follows a strict order of operations. It will always evaluate comparison operators first, then logical operators. And no, we don't support parentheses here. Why? Because nested parentheses are messy and unreadable. If your logic is too complex for a single line, use variables to break it down. It makes your code cleaner, and your brain will thank you later.
 

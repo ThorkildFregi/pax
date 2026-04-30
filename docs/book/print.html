@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-02fea9b4.js";
+            window.path_to_searchindex_js = "searchindex-e6170ac9.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-8cc3e45c.js"></script>
+        <script src="toc-a4c1f376.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -353,12 +353,16 @@ print(PI); // This works perfectly.
 <p>The keyword <code>if</code> is the start of your condition chain. Imagine a condition chain as a long hallway with many doors. The <code>if</code> is the very first one; to open it, you must meet the specific condition written on that door. If you manage to open the <code>if</code> door and walk through, all the other doors in the hallway lock, you can’t enter any others.</p>
 <p>To use <code>if</code>, all you need is a boolean.</p>
 <h3 id="boolean-1"><a class="header" href="#boolean-1">Boolean</a></h3>
-<p>I may not have told you everything you need to know about booleans yet, my apologies! In Pax, you have access to four different operations for now (more will be added later). These are split into two categories: comparison operators and logical operators.</p>
+<p>I may not have told you everything you need to know about booleans yet, my apologies! In Pax, you have access to eight different operations for now. These are split into two categories: comparison operators and logical operators.</p>
 <h4 id="comparison-operators"><a class="header" href="#comparison-operators">Comparison operators</a></h4>
-<p>Comparison operators are used to compare two values, whether they are strings, numbers, booleans, or variables. You have two at your disposal:</p>
+<p>Comparison operators are used to compare two values, whether they are strings, numbers, booleans, or variables. You have six at your disposal:</p>
 <ul>
 <li><code>==</code> : The “Equal to” operator. It checks if two values are the same.</li>
 <li><code>!=</code> : The “Not equal to” operator. It checks if two values are different.</li>
+<li><code>&gt;</code>: The “Strictly more” operator. It checks if a value is strictly superior to another.</li>
+<li><code>&lt;</code>: The “Strictly less” operator. It checks if a value is striclty inferior to another.</li>
+<li><code>&gt;=</code>: The “More or equal” operator. It checks if a value is superior or equal to another.</li>
+<li><code>&lt;=</code>: The “Less or equal” operator. It checks if a value is inferior or equal to another.</li>
 </ul>
 <p>Examples:</p>
 <pre><code class="language-pax">var alpha = 10;
@@ -366,6 +370,10 @@ var beta = 20;
 
 alpha == beta // Return false
 alpha != beta // Return true
+alpha &gt; beta  // Return false
+alpha &lt; beta  // Return true
+alpha &gt;= beta  // Return false
+alpha &lt;= beta  // Return true
 </code></pre>
 <h4 id="logical-operators"><a class="header" href="#logical-operators">Logical operators</a></h4>
 <p>Logical operators are used to combine booleans together. Just like with comparison, you have two logical operators:</p>
@@ -388,7 +396,7 @@ if alpha == beta | alpha != beta {
     println("I will be printed!");
 }
 </code></pre>
-<p>Why will this message be printed? First, <code>alpha == beta</code> returns <code>false</code>. However, <code>alpha != beta</code> returns <code>true</code>. Since the operator in the middle is <code>|</code> (OR), the entire expression evaluates to <code>true</code>. In an <code>if</code> statement, if the boolean is <code>true</code>, the code inside the curly brackets is executed.</p>
+<p>Why will this message be printed? First, <code>alpha == beta</code> returns <code>false</code>. However, <code>alpha != beta</code> returns <code>true</code>. Since the operator in the middle is <code>|</code> (OR), the entire expression evaluates to <code>true</code>. In an <code>if</code> statement, if the boolean is <code>true</code>, the code inside the curly brackets is executed. Note that the code inside the curly brackets is a program itself and so has access to his own local variables and not to the other variables.</p>
 <p>Note: Pax follows a strict order of operations. It will always evaluate comparison operators first, then logical operators. And no, we don’t support parentheses here. Why? Because nested parentheses are messy and unreadable. If your logic is too complex for a single line, use variables to break it down. It makes your code cleaner, and your brain will thank you later.</p>
 <h2 id="elif"><a class="header" href="#elif">Elif</a></h2>
 <p>Let’s have some fun again! If you need to handle <strong>A LOT OF CONDITIONS</strong>, you can use <code>elif</code> after an <code>if</code>. Let’s see if a number is odd or even… the “pioneer” way!</p>
@@ -480,6 +488,8 @@ if check_a &amp; check_b &amp; check_c {
     // Clean, flat, and beautiful.
 }
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="comments"><a class="header" href="#comments">Comments</a></h1>
 
                     </main>
 

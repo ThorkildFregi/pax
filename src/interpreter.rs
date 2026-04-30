@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, PartialOrd)]
 pub enum Value {
     Integer(i64),
 
@@ -71,7 +71,7 @@ impl Interpreter {
                                 if let Value::Boolean(b) = res {
                                     if b {
                                         let mut interpreter = Interpreter::new();
-                                        interpreter.run(program);
+                                        interpreter.run(cond.program);
                                         executed = true; 
                                         break;
                                     }
@@ -86,7 +86,7 @@ impl Interpreter {
                     if !executed {
                         if let Some(prog) = else_condition {
                             let mut interpreter = Interpreter::new();
-                            interpreter.run(program);
+                            interpreter.run(prog);
                         }
                     }
                 }
@@ -144,6 +144,10 @@ impl Interpreter {
                     },
                     Token::Equal => Ok(Value::Boolean(l == r)),
                     Token::Different => Ok(Value::Boolean(l != r)),
+                    Token::More => Ok(Value::Boolean(l > r)),
+                    Token::Less => Ok(Value::Boolean(l < r)),
+                    Token::MoreEqual => Ok(Value::Boolean(l >= r)),
+                    Token::LessEqual => Ok(Value::Boolean(l <= r)),
                     Token::Plus => match (l.clone(), r.clone()) {
                         (Value::Integer(a), Value::Integer(b)) => Ok(Value::Integer(a + b)),
                         (Value::String(a), Value::String(b)) => Ok(Value::String(format!("{}{}", a, b))),

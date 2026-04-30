@@ -164,7 +164,7 @@ impl Parser {
     }
 
     fn parse_equal(&mut self) -> Result<Expr, SyntaxError> {
-        Ok(parse_math_op!(self, parse_addition, self.current_token == Token::Equal || self.current_token == Token::Different))
+        Ok(parse_math_op!(self, parse_addition, self.current_token == Token::Equal || self.current_token == Token::Different || self.current_token == Token::More || self.current_token == Token::Less || self.current_token == Token::MoreEqual || self.current_token == Token::LessEqual))
     }
 
     fn parse_addition(&mut self) -> Result<Expr, SyntaxError> {
