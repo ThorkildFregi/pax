@@ -63,7 +63,7 @@ Note: Pax follows a strict order of operations. It will always evaluate comparis
 
 Let's have some fun again! If you need to handle **A LOT OF CONDITIONS**, you can use ```elif``` after an ```if```. Let's see if a number is odd or even... the "pioneer" way!
 
-Examples:
+Example:
 
 ```pax
 var number = 3; // Put whatever you want here
@@ -91,7 +91,9 @@ Note: **YOU SHOULD NEVER DO THIS**. It is messy, inefficient, and a terrible way
 
 ## Else
 
-But what if the number is 8, or 100, or a billion? We can't write a billion elif statements (unless you have a lot of free time). That is why we need a final safety net: the ```else``` keyword.
+But what if the number is 8, 100, or a billion? We can’t write a billion elif statements, unless you have a ridiculous amount of free time (or macro rules, but we said no macros for now!).
+
+That is why we need a final safety net: the else keyword. Think of it as the "catch-all" door at the very end of your hallway. It doesn't have a condition because it doesn't care; it simply opens if every other door stayed locked.
 
 ```pax
 if number == 1 {
@@ -100,5 +102,59 @@ if number == 1 {
     println("It's two!");
 } else {
     println("It's something else, and I'm too lazy to check!");
+}
+```
+
+## Nested Conditions
+
+Sometimes, one condition isn't enough. You might need to check something only if another condition is already ```true```. This is called nesting.
+
+```pax
+var is_day = true;
+var is_sunny = true;
+
+if is_day {
+    if is_sunny {
+        println("It's a beautiful day!");
+    } else {
+        println("It's day, but bring an umbrella.");
+    }
+} else {
+    println("It's night time.");
+}
+```
+
+### The Pyramid Of Doom
+
+Be careful! While nesting is useful, if you nest too many ```if``` statements, your code will start to shift further and further to the right. This is what developers call the Pyramid of Doom.
+
+If you find yourself nesting more than 3 levels deep:
+- 1. Stop. 
+- 2. Breathe. 
+- 3. Refactor. Use logical operators (```&```, ```|```) or variables to flatten your logic.
+
+Bad (The Messy Way):
+
+```pax
+if a == 1 {
+    if b == 2 {
+        if c == 3 {
+            // Your brain is now melting
+        }
+    }
+}
+```
+
+Good (The Pax Way):
+
+```pax
+var is_combo_valid = a == 1 & b == 2 & c == 3; // It works but it is not the best
+// Let's do it the REAL Pax way:
+var check_a = a == 1;
+var check_b = b == 2;
+var check_c = c == 3;
+
+if check_a & check_b & check_c {
+    // Clean, flat, and beautiful.
 }
 ```

@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-0b995b7c.js";
+            window.path_to_searchindex_js = "../searchindex-02fea9b4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-8cc3e45c.js"></script>
@@ -194,7 +194,7 @@ var bool_var = true;                // A boolean variable
 <h2 id="change-a-variable"><a class="header" href="#change-a-variable">Change a variable</a></h2>
 <p>Don’t like the content of your variable? No problem! You can change its value at any moment. Just write its name, without the <code>var</code> keyword, and assign a new value.
 Note: the new value must be of the same type as the original one. Otherwise, you will have to re-declare your variable using the <code>var</code> keyword. (I know, I’m being as annoying as Rust!)</p>
-<p>Examples:</p>
+<p>Example:</p>
 <pre><code class="language-pax">var mood = "Unhappy"; // I had to read Java code
 mood = "Happy"; // I can finally code in Pax
 </code></pre>
@@ -214,6 +214,16 @@ if alpha == beta { // Checking if alpha is equal to beta
 }
 </code></pre>
 <p>Note: Don’t worry about the <code>if</code> and <code>else</code> for now, <a href="./conditions.html">we will explore conditions in the next chapter!</a></p>
+<h2 id="constant-variables"><a class="header" href="#constant-variables">Constant Variables</a></h2>
+<p>Do you really, really, <strong>REALLY</strong> like the value of your variable? If you want to make sure it stays the same forever, you can add the keyword <code>const</code> after <code>var</code> in your declaration. Once you do that, nobody can ever change its value!</p>
+<p>Example:</p>
+<pre><code class="language-pax">var const PI = 3.14;
+
+PI = 4; // Error! You can't do that.
+
+print(PI); // This works perfectly.
+</code></pre>
+<p>Note: Convention dictates that <code>const</code> variables should be named in UPPERCASE. This helps other developers (and your future self) immediately recognize that this value is set in stone.</p>
 
                     </main>
 

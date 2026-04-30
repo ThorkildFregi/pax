@@ -35,7 +35,7 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-0b995b7c.js";
+            window.path_to_searchindex_js = "../searchindex-02fea9b4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="../toc-8cc3e45c.js"></script>
@@ -225,7 +225,7 @@ if alpha == beta | alpha != beta {
 <p>Note: Pax follows a strict order of operations. It will always evaluate comparison operators first, then logical operators. And no, we don’t support parentheses here. Why? Because nested parentheses are messy and unreadable. If your logic is too complex for a single line, use variables to break it down. It makes your code cleaner, and your brain will thank you later.</p>
 <h2 id="elif"><a class="header" href="#elif">Elif</a></h2>
 <p>Let’s have some fun again! If you need to handle <strong>A LOT OF CONDITIONS</strong>, you can use <code>elif</code> after an <code>if</code>. Let’s see if a number is odd or even… the “pioneer” way!</p>
-<p>Examples:</p>
+<p>Example:</p>
 <pre><code class="language-pax">var number = 3; // Put whatever you want here
 var is_even = false;
 
@@ -248,13 +248,69 @@ if number == 1 {
 </code></pre>
 <p>Note: <strong>YOU SHOULD NEVER DO THIS</strong>. It is messy, inefficient, and a terrible way to use <code>if</code> and <code>elif</code>. However, it perfectly illustrates how <code>elif</code> works: it’s just another door in the hallway that only checks its condition if the previous ones were locked.</p>
 <h2 id="else"><a class="header" href="#else">Else</a></h2>
-<p>But what if the number is 8, or 100, or a billion? We can’t write a billion elif statements (unless you have a lot of free time). That is why we need a final safety net: the <code>else</code> keyword.</p>
+<p>But what if the number is 8, 100, or a billion? We can’t write a billion elif statements, unless you have a ridiculous amount of free time (or macro rules, but we said no macros for now!).</p>
+<p>That is why we need a final safety net: the else keyword. Think of it as the “catch-all” door at the very end of your hallway. It doesn’t have a condition because it doesn’t care; it simply opens if every other door stayed locked.</p>
 <pre><code class="language-pax">if number == 1 {
     println("It's one!");
 } elif number == 2 {
     println("It's two!");
 } else {
     println("It's something else, and I'm too lazy to check!");
+}
+</code></pre>
+<h2 id="nested-conditions"><a class="header" href="#nested-conditions">Nested Conditions</a></h2>
+<p>Sometimes, one condition isn’t enough. You might need to check something only if another condition is already <code>true</code>. This is called nesting.</p>
+<pre><code class="language-pax">var is_day = true;
+var is_sunny = true;
+
+if is_day {
+    if is_sunny {
+        println("It's a beautiful day!");
+    } else {
+        println("It's day, but bring an umbrella.");
+    }
+} else {
+    println("It's night time.");
+}
+</code></pre>
+<h3 id="the-pyramid-of-doom"><a class="header" href="#the-pyramid-of-doom">The Pyramid Of Doom</a></h3>
+<p>Be careful! While nesting is useful, if you nest too many <code>if</code> statements, your code will start to shift further and further to the right. This is what developers call the Pyramid of Doom.</p>
+<p>If you find yourself nesting more than 3 levels deep:</p>
+<ul>
+<li>
+<ol>
+<li>Stop.</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Breathe.</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>Refactor. Use logical operators (<code>&amp;</code>, <code>|</code>) or variables to flatten your logic.</li>
+</ol>
+</li>
+</ul>
+<p>Bad (The Messy Way):</p>
+<pre><code class="language-pax">if a == 1 {
+    if b == 2 {
+        if c == 3 {
+            // Your brain is now melting
+        }
+    }
+}
+</code></pre>
+<p>Good (The Pax Way):</p>
+<pre><code class="language-pax">var is_combo_valid = a == 1 &amp; b == 2 &amp; c == 3; // It works but it is not the best
+// Let's do it the REAL Pax way:
+var check_a = a == 1;
+var check_b = b == 2;
+var check_c = c == 3;
+
+if check_a &amp; check_b &amp; check_c {
+    // Clean, flat, and beautiful.
 }
 </code></pre>
 

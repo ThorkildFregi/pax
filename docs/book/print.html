@@ -36,7 +36,7 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-0b995b7c.js";
+            window.path_to_searchindex_js = "searchindex-02fea9b4.js";
         </script>
         <!-- Start loading toc.js asap -->
         <script src="toc-8cc3e45c.js"></script>
@@ -316,7 +316,7 @@ var bool_var = true;                // A boolean variable
 <h2 id="change-a-variable"><a class="header" href="#change-a-variable">Change a variable</a></h2>
 <p>Don’t like the content of your variable? No problem! You can change its value at any moment. Just write its name, without the <code>var</code> keyword, and assign a new value.
 Note: the new value must be of the same type as the original one. Otherwise, you will have to re-declare your variable using the <code>var</code> keyword. (I know, I’m being as annoying as Rust!)</p>
-<p>Examples:</p>
+<p>Example:</p>
 <pre><code class="language-pax">var mood = "Unhappy"; // I had to read Java code
 mood = "Happy"; // I can finally code in Pax
 </code></pre>
@@ -336,6 +336,16 @@ if alpha == beta { // Checking if alpha is equal to beta
 }
 </code></pre>
 <p>Note: Don’t worry about the <code>if</code> and <code>else</code> for now, <a href="#conditions">we will explore conditions in the next chapter!</a></p>
+<h2 id="constant-variables"><a class="header" href="#constant-variables">Constant Variables</a></h2>
+<p>Do you really, really, <strong>REALLY</strong> like the value of your variable? If you want to make sure it stays the same forever, you can add the keyword <code>const</code> after <code>var</code> in your declaration. Once you do that, nobody can ever change its value!</p>
+<p>Example:</p>
+<pre><code class="language-pax">var const PI = 3.14;
+
+PI = 4; // Error! You can't do that.
+
+print(PI); // This works perfectly.
+</code></pre>
+<p>Note: Convention dictates that <code>const</code> variables should be named in UPPERCASE. This helps other developers (and your future self) immediately recognize that this value is set in stone.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="conditions"><a class="header" href="#conditions">Conditions</a></h1>
 <p>Conditions. Ah, conditions! You want to know if a number is odd or even? Conditions. You want to compare things? Conditions. Have you ever seen anything more powerful? (If you code in Rust, you know about macro rules, so you <em>have</em> seen something more powerful,but those aren’t included in Pax… for now). Let’s see how to use them right now!</p>
@@ -382,7 +392,7 @@ if alpha == beta | alpha != beta {
 <p>Note: Pax follows a strict order of operations. It will always evaluate comparison operators first, then logical operators. And no, we don’t support parentheses here. Why? Because nested parentheses are messy and unreadable. If your logic is too complex for a single line, use variables to break it down. It makes your code cleaner, and your brain will thank you later.</p>
 <h2 id="elif"><a class="header" href="#elif">Elif</a></h2>
 <p>Let’s have some fun again! If you need to handle <strong>A LOT OF CONDITIONS</strong>, you can use <code>elif</code> after an <code>if</code>. Let’s see if a number is odd or even… the “pioneer” way!</p>
-<p>Examples:</p>
+<p>Example:</p>
 <pre><code class="language-pax">var number = 3; // Put whatever you want here
 var is_even = false;
 
@@ -405,13 +415,69 @@ if number == 1 {
 </code></pre>
 <p>Note: <strong>YOU SHOULD NEVER DO THIS</strong>. It is messy, inefficient, and a terrible way to use <code>if</code> and <code>elif</code>. However, it perfectly illustrates how <code>elif</code> works: it’s just another door in the hallway that only checks its condition if the previous ones were locked.</p>
 <h2 id="else"><a class="header" href="#else">Else</a></h2>
-<p>But what if the number is 8, or 100, or a billion? We can’t write a billion elif statements (unless you have a lot of free time). That is why we need a final safety net: the <code>else</code> keyword.</p>
+<p>But what if the number is 8, 100, or a billion? We can’t write a billion elif statements, unless you have a ridiculous amount of free time (or macro rules, but we said no macros for now!).</p>
+<p>That is why we need a final safety net: the else keyword. Think of it as the “catch-all” door at the very end of your hallway. It doesn’t have a condition because it doesn’t care; it simply opens if every other door stayed locked.</p>
 <pre><code class="language-pax">if number == 1 {
     println("It's one!");
 } elif number == 2 {
     println("It's two!");
 } else {
     println("It's something else, and I'm too lazy to check!");
+}
+</code></pre>
+<h2 id="nested-conditions"><a class="header" href="#nested-conditions">Nested Conditions</a></h2>
+<p>Sometimes, one condition isn’t enough. You might need to check something only if another condition is already <code>true</code>. This is called nesting.</p>
+<pre><code class="language-pax">var is_day = true;
+var is_sunny = true;
+
+if is_day {
+    if is_sunny {
+        println("It's a beautiful day!");
+    } else {
+        println("It's day, but bring an umbrella.");
+    }
+} else {
+    println("It's night time.");
+}
+</code></pre>
+<h3 id="the-pyramid-of-doom"><a class="header" href="#the-pyramid-of-doom">The Pyramid Of Doom</a></h3>
+<p>Be careful! While nesting is useful, if you nest too many <code>if</code> statements, your code will start to shift further and further to the right. This is what developers call the Pyramid of Doom.</p>
+<p>If you find yourself nesting more than 3 levels deep:</p>
+<ul>
+<li>
+<ol>
+<li>Stop.</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>Breathe.</li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>Refactor. Use logical operators (<code>&amp;</code>, <code>|</code>) or variables to flatten your logic.</li>
+</ol>
+</li>
+</ul>
+<p>Bad (The Messy Way):</p>
+<pre><code class="language-pax">if a == 1 {
+    if b == 2 {
+        if c == 3 {
+            // Your brain is now melting
+        }
+    }
+}
+</code></pre>
+<p>Good (The Pax Way):</p>
+<pre><code class="language-pax">var is_combo_valid = a == 1 &amp; b == 2 &amp; c == 3; // It works but it is not the best
+// Let's do it the REAL Pax way:
+var check_a = a == 1;
+var check_b = b == 2;
+var check_c = c == 3;
+
+if check_a &amp; check_b &amp; check_c {
+    // Clean, flat, and beautiful.
 }
 </code></pre>
 

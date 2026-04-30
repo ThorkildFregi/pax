@@ -23,7 +23,7 @@ var bool_var = true;                // A boolean variable
 Don't like the content of your variable? No problem! You can change its value at any moment. Just write its name, without the ```var``` keyword, and assign a new value.
 Note: the new value must be of the same type as the original one. Otherwise, you will have to re-declare your variable using the ```var``` keyword. (I know, I’m being as annoying as Rust!)
 
-Examples:
+Example:
 
 ```pax
 var mood = "Unhappy"; // I had to read Java code
@@ -51,3 +51,19 @@ if alpha == beta { // Checking if alpha is equal to beta
 ```
 
 Note: Don't worry about the ```if``` and ```else``` for now, [we will explore conditions in the next chapter!](./conditions.md)
+
+## Constant Variables
+
+Do you really, really, **REALLY** like the value of your variable? If you want to make sure it stays the same forever, you can add the keyword ```const``` after ```var``` in your declaration. Once you do that, nobody can ever change its value!
+
+Example:
+
+```pax
+var const PI = 3.14;
+
+PI = 4; // Error! You can't do that.
+
+print(PI); // This works perfectly.
+```
+
+Note: Convention dictates that ```const``` variables should be named in UPPERCASE. This helps other developers (and your future self) immediately recognize that this value is set in stone.
