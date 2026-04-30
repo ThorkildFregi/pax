@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-3a8c518e.js";
+            window.path_to_searchindex_js = "../searchindex-0b995b7c.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-6074132a.js"></script>
+        <script src="../toc-8cc3e45c.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -185,15 +185,15 @@
 <h2 id="terminal-tools"><a class="header" href="#terminal-tools">Terminal tools</a></h2>
 <p>For all terminal commands, we are going to use <code>bash</code>. If you are on Windows, I recommend using PowerShell or WSL (Windows Subsystem for Linux).</p>
 <h2 id="project-directory-setup"><a class="header" href="#project-directory-setup">Project Directory Setup</a></h2>
-<p>Listen carefully: as I already said before, if you write messy code in your <code>home</code> folder, I don’t care, it is none of my bussiness. we are going to take a clean approach. First, we will create our project directory.</p>
-<p>Note: You should start by creating a dedicated folder for all your programming projects.</p>
+<p>Listen carefully: as I already said before, if you write messy code in your <code>home</code> folder, I don’t care, it is none of my bussiness. But we are going to take a clean approach. First, we will create our project directory.</p>
 <pre><code class="language-bash">$ mkdir journey_middle_earth
 $ cd journey_middle_earth
 </code></pre>
+<p>Note: You should start by creating a dedicated folder for all your programming projects.</p>
 <h2 id="pax-program-basics"><a class="header" href="#pax-program-basics">Pax Program Basics</a></h2>
 <p>Next, create a source file and name it <code>journey.pax</code>. Pax files can technically end with any extension you like; however, if you don’t use <code>.pax</code>, you will be issued a warning. If you use more than one word in your filename, the convention is to use underscores to separate them. For example, use <code>hello_world.pax</code> instead of <code>helloWorld.pax</code>.</p>
 <p>Now open <code>journey.pax</code> and type:</p>
-<pre><code class="language-pax">var msg = "I defeated Sauron";
+<pre><code class="language-pax">var msg = "I defeated Sauron !";
 
 print(msg);
 </code></pre>
@@ -204,6 +204,16 @@ print(msg);
 <pre><code class="language-bash">I defeated Sauron !
 </code></pre>
 <h2 id="the-explanation-of-this-journey"><a class="header" href="#the-explanation-of-this-journey">The explanation of this journey</a></h2>
+<p>Unlike C++ or Rust, and more like Python, Pax does not require a <code>main</code> function to work. You can start coding directly, and it will run without any issues.</p>
+<p>However, and this is for my messy boys and girls out there, line breaks and indentation do not influence how your code runs. In Pax, every instruction ends with a semicolon <code>;</code>, and conditions, loops, and functions use curly brackets <code>{}</code>. We will dive deeper into these in the next chapters.</p>
+<pre><code class="language-pax">var msg = "I defeated Sauron !";
+</code></pre>
+<p>The first line of <code>journey.pax</code> is a <a href="./../common_programming_concepts/variables.html">variable</a> declaration. It is identified by the keyword <code>var</code>. Immediately following the keyword is the name of the variable, in this case, <code>msg</code>. Next comes the assignment token <code>=</code>, followed by a string: <code>"I defeated Sauron!"</code>. A string is easily recognizable by the double quotes <code>" "</code> surrounding the text. <a href="./../common_programming_concepts/data_types.html">(We will dive into data types later!)</a></p>
+<pre><code class="language-pax">print(msg);
+</code></pre>
+<p>The second line is the most important one here. The <code>print</code> function will be your best friend. It is the function that writes to your terminal. Note that <code>print</code> outputs text without a line break; if you need one, please use <code>println</code>. Here, you are calling <code>print</code> and passing it a parameter: the content of our variable <code>msg</code>.</p>
+<h2 id="conclusion"><a class="header" href="#conclusion">Conclusion</a></h2>
+<p>Congratulations! You made it through your first journey with Pax! Next chapters will deep more into Pax logics and possibilities.</p>
 
                     </main>
 
@@ -213,6 +223,9 @@ print(msg);
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
+                            <a rel="next prefetch" href="../common_programming_concepts/intro.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                            </a>
 
                         <div style="clear: both"></div>
                     </nav>
@@ -224,6 +237,9 @@ print(msg);
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
+                    <a rel="next prefetch" href="../common_programming_concepts/intro.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
+                    </a>
             </nav>
 
         </div>
@@ -266,6 +282,7 @@ print(msg);
         <script src="../book-a0b12cfe.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../src/theme/pax-lang-24ee1103.js"></script>
 
 
 

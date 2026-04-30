@@ -7,7 +7,6 @@ use std::fs;
 use std::env;
 use std::process;
 
-use tempfile::tempdir;
 use include_dir::{include_dir, Dir};
 
 use token::Token;
@@ -54,20 +53,17 @@ fn main() {
 }
 
 fn open_docs() {
-    let mut temp_docs = env::temp_dir();
-    temp_docs.push(format!("pax_docs_v{}", env!("CARGO_PKG_VERSION")));
+    if let Some(home_dir) = dirs::home_dir() {
+        let docs_path = home_dir.join("pax_docs");
 
-    if !temp_docs.exists() {
-        fs::create_dir_all(&temp_docs).unwrap();
-        DOCS.extract(&temp_docs).expect("Failed to extract embedded documentation");
-    }
+        fs::create_dir_all(&docs_path).expect("Failed to create docs directory");
 
-    let index_path = temp_docs.join("index.html");
-    println!("Opening local documentation (v{})...", env!("CARGO_PKG_VERSION"));
-    
-    if let Err(_) = open::that(index_path) {
-        eprintln!("Error: Could not open the browser automatically.");
-        eprintln!("You can find the documentation here: {:?}", temp_docs);
+        DOC_DIR.extract(&docs_path).expect("Failed to extract embedded documentation");
+
+        let index_path = docs_path.join("index.html");
+        open::that(index_path).expect("Failed to open browser");
+    } else {
+        eprintln!("Could not find your home directory!");
     }
 }
 

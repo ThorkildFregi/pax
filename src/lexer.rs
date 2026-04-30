@@ -90,8 +90,8 @@ impl Lexer {
                         return Token::Star;
                     }
                     '/' => {
+                        self.state = 6;
                         self.pos += 1;
-                        return Token::Slash;
                     }
                     '^' => {
                         self.pos += 1;
@@ -151,6 +151,20 @@ impl Lexer {
                         return Token::Different;
                     }
                     _ => return Token::Not,
+                }
+                6 => match ch {
+                    '/' => {
+                        self.state = 7;
+                        self.pos += 1;
+                    }
+                    _ => return Token::Slash,
+                }
+                7 => match ch {
+                    '\n' => {
+                        self.state = 0;
+                        self.pos += 1;
+                    }
+                    _ => self.pos += 1,
                 }
                 _ => return Token::Error(format!("Unknown state {}", self.state)),
             }
