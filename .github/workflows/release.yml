@@ -16,32 +16,37 @@ jobs:
           - os: ubuntu-latest
             artifact_name: pax
             os_suffix: pax-linux-x64
-          - os: windows-latest
-            artifact_name: pax.exe
-            os_suffix: pax-windows-x64.exe
+            # URL Linux
+            mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-unknown-linux-gnu.tar.gz
           - os: macos-latest
             artifact_name: pax
             os_suffix: pax-macos-x64
+            # URL macOS (Darwin)
+            mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-apple-darwin.tar.gz
+          - os: windows-latest
+            artifact_name: pax.exe
+            os_suffix: pax-windows-x64
+            # URL Windows
+            mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-pc-windows-msvc.zip
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install mdBook
+      - name: Install mdBook (Linux/macOS)
+        if: runner.os != 'Windows'
         run: |
-          if [ "${{ matrix.os }}" = "windows-latest" ]; then
-            # Installation simplifiée pour Windows
-            curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-pc-windows-msvc.zip -o mdbook.zip
-            tar -xf mdbook.zip
-          else
-            curl -sSL https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-unknown-linux-gnu.tar.gz | tar -xz
-          fi
-          # On s'assure que mdbook est exécutable
-          mv mdbook* ${{ matrix.os == 'windows-latest' && 'mdbook.exe' || 'mdbook' }}
+          curl -sSL ${{ matrix.mdbook_url }} | tar -xz
+          chmod +x mdbook
+
+      - name: Install mdBook (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          curl -sSL ${{ matrix.mdbook_url }} -o mdbook.zip
+          tar -xf mdbook.zip
 
       - name: Build Documentation
         run: |
-          chmod +x ./mdbook 
-          ./mdbook build docs
+          ${{ runner.os == 'Windows' && './mdbook.exe' || './mdbook' }} build docs
 
       - name: Build Pax (Rust)
         run: cargo build --release
