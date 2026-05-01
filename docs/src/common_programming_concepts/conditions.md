@@ -64,7 +64,7 @@ if alpha == beta | alpha != beta {
 }
 ```
 
-Why will this message be printed? First, ```alpha == beta``` returns ```false```. However, ```alpha != beta``` returns ```true```. Since the operator in the middle is ```|``` (OR), the entire expression evaluates to ```true```. In an ```if``` statement, if the boolean is ```true```, the code inside the curly brackets is executed. Note that the code inside the curly brackets is a program itself and so has access to his own local variables and not to the other variables.
+Why will this message be printed? First, ```alpha == beta``` returns ```false```. However, ```alpha != beta``` returns ```true```. Since the operator in the middle is ```|``` (OR), the entire expression evaluates to ```true```. In an ```if``` statement, if the boolean is ```true```, the code inside the curly brackets is executed.
 
 Note: Pax follows a strict order of operations. It will always evaluate comparison operators first, then logical operators. And no, we don't support parentheses here. Why? Because nested parentheses are messy and unreadable. If your logic is too complex for a single line, use variables to break it down. It makes your code cleaner, and your brain will thank you later.
 
