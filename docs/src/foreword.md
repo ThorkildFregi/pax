@@ -2,7 +2,7 @@
 
 Pax is a new and young programming language. At the same time, I, Gabriel Bermes--Poupeau, am a 17-year-old developer, new to Rust and the world of programming language design. This is my very first project in Rust, and it has been a beautiful discovery of the language.
 
-Right now, Pax is simple, it handles variables and conditions, but my goal is to continuously update and evolve it throughout my studies and beyond.
+Right now, Pax is simple, but my goal is to continuously update and evolve it throughout my studies and beyond.
 
 If you use it today, I would be very grateful. I would also like to ask for as much feedback as possible so that this language can grow.
 

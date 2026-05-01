@@ -16,17 +16,14 @@ jobs:
           - os: ubuntu-latest
             artifact_name: pax
             os_suffix: pax-linux-x64
-            # URL Linux
             mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-unknown-linux-gnu.tar.gz
           - os: macos-latest
             artifact_name: pax
             os_suffix: pax-macos-x64
-            # URL macOS (Darwin)
             mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-apple-darwin.tar.gz
           - os: windows-latest
             artifact_name: pax.exe
             os_suffix: pax-windows-x64
-            # URL Windows
             mdbook_url: https://github.com/rust-lang/mdBook/releases/download/v0.4.37/mdbook-v0.4.37-x86_64-pc-windows-msvc.zip
 
     steps:
