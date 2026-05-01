@@ -110,6 +110,7 @@ pub enum Stmt {
         name: String,
         value: Expr,
         is_constant: bool,
+        is_global: bool,
     },
     VarChange {
         name: String,
@@ -252,13 +253,23 @@ impl Parser {
 
     fn parse_var(&mut self, is_declaration: bool) -> Result<Stmt, SyntaxError> {
         let mut is_constant = false;
+        let mut is_global = false;
         
         if is_declaration {
             self.advance();
-
-            if self.current_token == Token::KeywordConst {
-                is_constant = true;
-                self.advance();
+            
+            while self.current_token == Token::KeywordConst || self.current_token == Token::KeywordGlobal {
+                match self.current_token {
+                    Token::KeywordConst => {
+                        is_constant = true;
+                        self.advance();
+                    },
+                    Token::KeywordGlobal => {
+                        is_global = true;
+                        self.advance();
+                    },
+                    _ => break,
+                }
             }
         }
 
@@ -271,7 +282,7 @@ impl Parser {
         expect_token!(self, Token::Semicolon);
 
         if is_declaration {
-            Ok(Stmt::VarDeclaration { name, value, is_constant }) 
+            Ok(Stmt::VarDeclaration { name, value, is_constant, is_global }) 
         } else {
             Ok(Stmt::VarChange { name, value })
         }

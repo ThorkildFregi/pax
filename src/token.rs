@@ -2,6 +2,7 @@
 pub enum Token {
     KeywordVar,
     KeywordConst,
+    KeywordGlobal,
 
     KeywordIf,
     KeywordElif,
