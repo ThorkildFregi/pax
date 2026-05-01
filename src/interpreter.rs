@@ -19,46 +19,58 @@ struct VariableSlot {
 }
 
 pub struct Interpreter {
-    variables: HashMap<String, VariableSlot>,
+    scope_stack: Vec<HashMap<String, VariableSlot>>,
 }
 
 impl Interpreter {
     pub fn new() -> Self {
         Self {
-            variables: HashMap::new(),
+            scope_stack: vec![HashMap::new()],
         }
     }
 
     pub fn run(&mut self, program: Program) {
         for stmt in program.statements {
             match stmt {
-                Stmt::VarDeclaration { name, value, is_constant } => {
+                Stmt::VarDeclaration { name, value, is_constant, is_global } => {
                     match self.evaluate(value) {
-                        Ok(res) => { self.variables.insert(name, VariableSlot { value: res, is_constant }); },
+                        Ok(res) => {
+                            if is_global {
+                                self.scope_stack[0].insert(name, VariableSlot { value: res, is_constant });
+                            } else {
+                                self.scope_stack.last_mut().unwrap().insert(name, VariableSlot { value: res, is_constant });
+                            }
+                        }
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
                     }
                 }
                 Stmt::VarChange { name, value } => {
                     match self.evaluate(value) {
                         Ok(new_val) => {
-                            if let Some(slot) = self.variables.get_mut(&name) {
-                                if slot.is_constant {
-                                    eprintln!("Runtime Error: Can't modify constant variable '{}'", name);
-                                    return;
-                                }
+                            let mut found = false;
+                            for scope in self.scope_stack.iter_mut().rev() {
+                                if let Some(slot) = scope.get_mut(&name) {
+                                    if slot.is_constant {
+                                        eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                        return;
+                                    }
 
-                                if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
-                                    slot.value = new_val;
-                                } else {
-                                    eprintln!("Runtime Error: TypeError: Variable '{}' must remain of the same type", name);
-                                    return;
+                                    if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
+                                        slot.value = new_val;
+                                        found = true;
+                                        break;
+                                    } else {
+                                        eprintln!("Runtime Error: TypeError for '{}'", name);
+                                        return;
+                                    }
                                 }
-                            } else {
-                                eprintln!("Runtime Error: Variable '{}' not declared. Use 'var' first.", name);
+                            }
+                            if !found {
+                                eprintln!("Runtime Error: Variable '{}' not found", name);
                                 return;
                             }
                         },
-                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                        Err(e) => { eprintln!("{}", e); return; }
                     }
                 }
 
@@ -70,8 +82,10 @@ impl Interpreter {
                             Ok(res) => {
                                 if let Value::Boolean(b) = res {
                                     if b {
-                                        let mut interpreter = Interpreter::new();
-                                        interpreter.run(cond.program);
+                                        self.scope_stack.push(HashMap::new());
+                                        self.run(cond.program);
+                                        self.scope_stack.pop();
+                                        
                                         executed = true; 
                                         break;
                                     }
@@ -85,8 +99,9 @@ impl Interpreter {
                     }
                     if !executed {
                         if let Some(prog) = else_condition {
-                            let mut interpreter = Interpreter::new();
-                            interpreter.run(prog);
+                            self.scope_stack.push(HashMap::new());
+                            self.run(prog);
+                            self.scope_stack.pop();
                         }
                     }
                 }
@@ -107,11 +122,16 @@ impl Interpreter {
         }
     }
 
-    fn evaluate(&self, expr: Expr) -> Result<Value, String> {
+    fn evaluate(&mut self, expr: Expr) -> Result<Value, String> {
         match expr {
             Expr::Integer(n) => Ok(Value::Integer(n)),
             Expr::Variable(name) => {
-                Ok(self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name)).unwrap().value)
+                for scope in self.scope_stack.iter().rev() {
+                    if let Some(slot) = scope.get(&name) {
+                        return Ok(slot.value.clone());
+                    }
+                }
+                Err(format!("Runtime Error: Variable '{}' not found", name))
             }
             Expr::String(string) => Ok(Value::String(string)),
             Expr::Boolean(boolean) => Ok(Value::Boolean(boolean)),

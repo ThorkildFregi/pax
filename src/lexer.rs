@@ -202,6 +202,7 @@ impl Lexer {
                 match value.as_str() {
                     "var" => Token::KeywordVar,
                     "const" => Token::KeywordConst,
+                    "global" => Token::KeywordGlobal,
 
                     "if" => Token::KeywordIf,
                     "elif" => Token::KeywordElif,
