@@ -60,6 +60,8 @@ You can find pre-compiled binaries for Linux, macOS, and Windows on our [GitHub]
 
 ## Version
 
+Actually in v0.2.0-alpha, here are the new features:
+
 - Add Scope Stack
 
 ## License
