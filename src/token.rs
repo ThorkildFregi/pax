@@ -4,6 +4,9 @@ pub enum Token {
     KeywordConst,
     KeywordGlobal,
 
+    KeywordAppend,
+    KeywordPop,
+
     KeywordIf,
     KeywordElif,
     KeywordElse,
@@ -30,6 +33,7 @@ pub enum Token {
 
     Assign,
     Comma,
+    Dot,
 
     And,
     Or,

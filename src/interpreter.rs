@@ -118,6 +118,72 @@ impl Interpreter {
                         eprintln!("Runtime Error: Variable '{}' not found", name);
                     }
                 }
+                Stmt::ListModification { name, operation, value } => {
+                    match operation.as_str() {
+                        "append" => {
+                            if let Some(new_val) = value {
+                                let new_value = match self.evaluate(new_val) {
+                                    Ok(v) => v,
+                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                                };
+
+                                let mut found = false;
+                                for scope in self.scope_stack.iter_mut().rev() {
+                                    if let Some(slot) = scope.get_mut(&name) {
+                                        if slot.is_constant {
+                                            eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                            return;
+                                        }
+
+                                        match &mut slot.value {
+                                            Value::List(list) => {
+                                                list.push(new_value);
+                                            }
+                                            _ => {
+                                                eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                                return;
+                                            }
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if !found {
+                                    eprintln!("Runtime Error: Variable '{}' not found", name);
+                                }
+                            }
+                        }
+                        "pop" => {
+                            let mut found = false;
+                            for scope in self.scope_stack.iter_mut().rev() {
+                                if let Some(slot) = scope.get_mut(&name) {
+                                    if slot.is_constant {
+                                        eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                        return;
+                                    }
+
+                                    match &mut slot.value {
+                                        Value::List(list) => {
+                                            list.pop();
+                                        }
+                                        _ => {
+                                            eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                            return;
+                                        }
+                                    }
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if !found {
+                                eprintln!("Runtime Error: Variable '{}' not found", name);
+                            }
+                        }
+                        _ => (),
+                    }
+                }
 
                 Stmt::ConditionChain { conditions, else_condition } => {
                     let mut executed = false;

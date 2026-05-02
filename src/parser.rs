@@ -123,6 +123,11 @@ pub enum Stmt {
         index: Expr,
         value: Expr,
     },
+    ListModification {
+        name: String,
+        operation: String,
+        value: Option<Expr>,
+    },
 
     While {
         condition: Expr,
@@ -328,6 +333,36 @@ impl Parser {
             index_expr = Some(self.parse_expression()?);
             expect_token!(self, Token::RightSquareBracket);
 
+        } else if self.current_token == Token::Dot {
+            self.advance();
+
+            match self.current_token {
+                Token::KeywordAppend => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    let value = Some(self.parse_expression()?);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::ListModification { name, operation: "append".into(), value: value });
+                }
+                Token::KeywordPop => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::ListModification { name, operation: "pop".into(), value: None });
+                }
+                _ => return Err(SyntaxError {
+                    message: "Keyword unknown".into(),
+                    line: self.lexer.line,
+                }),
+            }
         }
 
         expect_token!(self, Token::Assign);

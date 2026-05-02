@@ -49,6 +49,10 @@ impl Lexer {
                         self.pos += 1;
                         return Token::Comma;
                     }
+                    '.' => {
+                        self.pos += 1;
+                        return Token::Dot;
+                    }
                     '!' => {
                         self.state = 5;
                         self.pos += 1;
@@ -215,6 +219,9 @@ impl Lexer {
                     "var" => Token::KeywordVar,
                     "const" => Token::KeywordConst,
                     "global" => Token::KeywordGlobal,
+
+                    "append" => Token::KeywordAppend,
+                    "pop" => Token::KeywordPop,
 
                     "if" => Token::KeywordIf,
                     "elif" => Token::KeywordElif,
