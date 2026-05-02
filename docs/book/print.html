@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7c6e0b74.js";
+            window.path_to_searchindex_js = "searchindex-50bc1a21.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-a4c1f376.js"></script>
+        <script src="toc-6696266a.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -380,6 +380,30 @@ var const pi = 3.14  // (Local constant)
 var global pi = 3.14 // (Global mutable)
 </code></pre>
 <p>Why? Because our parser uses a “smart-collect” loop. It gathers all your flags first, then builds the variable. No more syntax errors because you swapped two words.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="lists-and-maps"><a class="header" href="#lists-and-maps">Lists And Maps</a></h1>
+<p>Pax provides two powerful built-in data structures to organize and manage your data efficiently: Lists (ordered sequences) and Maps (key-value pairs).</p>
+<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
+<p>Lists in Pax are dynamic, ordered collections of values. They are ideal for storing sequences of data that you need to access by index or iterate over.</p>
+<h3 id="definition"><a class="header" href="#definition">Definition</a></h3>
+<p>Define a list using square brackets []:</p>
+<p>Example:</p>
+<pre><code class="language-pax">var my_list = [0, 1, 2, 3, 4];
+</code></pre>
+<p>Note: Lists in Pax are zero-indexed. This means indices range from <code>0</code> to <code>len - 1</code>.</p>
+<h3 id="accessing--modifying-elements"><a class="header" href="#accessing--modifying-elements">Accessing &amp; Modifying Elements</a></h3>
+<p>To access or modify an element, use the list name followed by the index in square brackets:</p>
+<p>Example:</p>
+<pre><code class="language-pax">my_list[2] = 5; // Changes the third element to 5
+</code></pre>
+<h3 id="adding--removing-elements"><a class="header" href="#adding--removing-elements">Adding &amp; Removing Elements</a></h3>
+<p>Need to resize your list? We’ve got you covered. Use the <code>append</code> keyword to add an element to the end, or <code>pop</code> to remove the last one.</p>
+<p>Examples:</p>
+<pre><code class="language-pax">var my_list = [0, 1, 2];
+
+my_list.append(3); // my_list is now [0, 1, 2, 3]
+my_list.pop();     // my_list is now [0, 1, 2]
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="conditions"><a class="header" href="#conditions">Conditions</a></h1>
 <p>Conditions. Ah, conditions! You want to know if a number is odd or even? Conditions. You want to compare things? Conditions. Have you ever seen anything more powerful? (If you code in Rust, you know about macro rules, so you <em>have</em> seen something more powerful,but those aren’t included in Pax… for now). Let’s see how to use them right now!</p>

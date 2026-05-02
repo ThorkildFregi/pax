@@ -11,5 +11,6 @@
 - [Common Programming Concepts](./common_programming_concepts/intro.md)
     - [Data Types](./common_programming_concepts/data_types.md)
     - [Variables](./common_programming_concepts/variables.md)
+    - [Lists and Maps](./common_programming_concepts/lists-maps.md)
     - [Conditions](./common_programming_concepts/conditions.md)
     - [Comments](./common_programming_concepts/comments.md)
