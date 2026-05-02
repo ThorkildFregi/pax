@@ -118,6 +118,11 @@ pub enum Stmt {
         name: String,
         value: Expr,
     },
+    ListChange {
+        name: String,
+        index: Expr,
+        value: Expr,
+    },
 
     While {
         condition: Expr,
@@ -296,6 +301,7 @@ impl Parser {
     fn parse_var(&mut self, is_declaration: bool) -> Result<Stmt, SyntaxError> {
         let mut is_constant = false;
         let mut is_global = false;
+        let mut index_expr: Option<Expr> = None;
         
         if is_declaration {
             self.advance();
@@ -316,6 +322,13 @@ impl Parser {
         }
 
         let name = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
+    
+        if self.current_token == Token::LeftSquareBracket {
+            self.advance();
+            index_expr = Some(self.parse_expression()?);
+            expect_token!(self, Token::RightSquareBracket);
+
+        }
 
         expect_token!(self, Token::Assign);
 
@@ -323,8 +336,17 @@ impl Parser {
 
         expect_token!(self, Token::Semicolon);
 
+        if is_declaration && index_expr.is_some() {
+            return Err(SyntaxError {
+                message: "Cannot index a variable during declaration".into(),
+                line: self.lexer.line,
+            });
+        }
+
         if is_declaration {
             Ok(Stmt::VarDeclaration { name, value, is_constant, is_global }) 
+        } else if let Some(index) = index_expr {
+            Ok(Stmt::ListChange { name, index, value })
         } else {
             Ok(Stmt::VarChange { name, value })
         }

@@ -75,6 +75,49 @@ impl Interpreter {
                         Err(e) => { eprintln!("{}", e); return; }
                     }
                 }
+                Stmt::ListChange { name, index, value } => {
+                    let new_val = match self.evaluate(value) {
+                        Ok(v) => v,
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    };
+
+                    let idx = match self.evaluate(index) {
+                        Ok(Value::Integer(i)) => i,
+                        Ok(_) => { eprintln!("Runtime Error: Index must be an integer"); return; }
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    };
+
+                    let mut found = false;
+                    for scope in self.scope_stack.iter_mut().rev() {
+                        if let Some(slot) = scope.get_mut(&name) {
+                            if slot.is_constant {
+                                eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                return;
+                            }
+
+                            match &mut slot.value {
+                                Value::List(list) => {
+                                    if idx >= 0 && (idx as usize) < list.len() {
+                                        list[idx as usize] = new_val;
+                                    } else {
+                                        eprintln!("Runtime Error: Index {} out of bounds for list '{}'", idx, name);
+                                        return;
+                                    }
+                                }
+                                _ => {
+                                    eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                    return;
+                                }
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if !found {
+                        eprintln!("Runtime Error: Variable '{}' not found", name);
+                    }
+                }
 
                 Stmt::ConditionChain { conditions, else_condition } => {
                     let mut executed = false;
