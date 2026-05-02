@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Token {
     KeywordVar,
     KeywordConst,
@@ -36,6 +36,7 @@ pub enum Token {
     Assign,
     Comma,
     Dot,
+    Colon,
 
     And,
     Or,

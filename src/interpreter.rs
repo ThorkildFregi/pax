@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
@@ -12,6 +12,7 @@ pub enum Value {
     Boolean(bool),
 
     List(Vec<Value>),
+    Map(BTreeMap<String, Value>)
 }
 
 #[derive(Clone)]
@@ -302,6 +303,17 @@ impl Interpreter {
 
                 Ok(Value::List(elems))
             }
+            Expr::Map(elements) => {
+                let mut map = BTreeMap::new();
+
+                for element in elements {
+                    if let Value::String(key) = self.evaluate(element.0)? {
+                        map.insert(key, self.evaluate(element.1)?);
+                    }
+                }
+
+                Ok(Value::Map(map))
+            }
             Expr::Unary { operator, right } => {
                 let res = self.evaluate(*right)?;
 
@@ -384,6 +396,18 @@ impl std::fmt::Display for Value {
                 }
                 
                 write!(f, "]")
+            }
+            Value::Map(map) => {
+                write!(f, "{{")?;
+
+                for (i, (key, val)) in map.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "\"{}\": {}", key, val)?; 
+                }
+                
+                write!(f, "}}")
             }
         }
     }

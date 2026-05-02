@@ -67,6 +67,48 @@ macro_rules! parse_math_op {
     };
 }
 
+macro_rules! parse_list_map {
+    ($parser:expr, $token:expr, $to_push:expr, $err_msg:expr, $expression:ident) => {
+        {
+            self.advance();
+
+            let mut elements = Vec::new();
+
+            if self.current_token == Token::RightCurlyBracket {
+                self.advance();
+                return Ok(Expr::Map(elements));
+            }
+
+            loop {
+                if $expression == Map {
+                    
+                }
+                let key = self.parse_expression()?;
+
+                expect_token!(self, Token::Colon);
+
+                let value = self.parse_expression()?;
+
+                elements.push((key, value));
+
+                match self.current_token {
+                    Token::Comma => {
+                        self.advance();
+                    }
+                    Token::RightCurlyBracket => break,
+                    _ => return Err(SyntaxError {
+                        message: "Expected ',' or '}' after map element".into(),
+                        line: self.lexer.line,
+                    }),
+                }
+            }
+
+            self.advance();
+            Ok(Expr::Map(elements))
+        }
+    };
+}
+
 use crate::token::Token;
 use crate::lexer::Lexer;
 
@@ -79,6 +121,7 @@ pub enum Expr {
     Boolean(bool),
 
     List(Vec<Expr>),
+    Map(Vec<(Expr, Expr)>),
 
     Variable(String),
 
@@ -248,6 +291,10 @@ impl Parser {
                 Ok(self.parse_list()?)
             }
 
+            Token::LeftCurlyBracket => {
+                Ok(self.parse_map()?)
+            }
+
             _ => Err(SyntaxError {
                 message: format!("Unknown expression: {:?}", self.current_token),
                 line: self.lexer.line,
@@ -260,7 +307,7 @@ impl Parser {
 
         let mut elements = Vec::new();
 
-        if self.current_token == Token::RightBracket {
+        if self.current_token == Token::RightSquareBracket {
             self.advance();
             return Ok(Expr::List(elements));
         }
@@ -282,6 +329,10 @@ impl Parser {
 
         self.advance();
         Ok(Expr::List(elements))
+    }
+
+    fn parse_map(&mut self) -> Result<Expr, SyntaxError> {
+        Ok(parse_list_map!(self, Token::RightCurlyBracket, "Expected ',' or '}' after map element", Map))
     }
 
     fn parse_statement(&mut self) -> Result<Stmt, SyntaxError> {

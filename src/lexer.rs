@@ -53,6 +53,10 @@ impl Lexer {
                         self.pos += 1;
                         return Token::Dot;
                     }
+                    ':' => {
+                        self.pos += 1;
+                        return Token::Colon;
+                    }
                     '!' => {
                         self.state = 5;
                         self.pos += 1;
