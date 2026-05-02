@@ -106,6 +106,27 @@ impl Interpreter {
                     }
                 }
 
+                Stmt::While { condition, program } => {
+                    loop {
+                        match self.evaluate(condition.clone()) {
+                            Ok(Value::Boolean(true)) => {
+                                self.scope_stack.push(HashMap::new());
+                                self.run(program.clone()); 
+                                self.scope_stack.pop();
+                            }
+                            Ok(Value::Boolean(false)) => break,
+                            Ok(_) => {
+                                eprintln!("Runtime Error: Condition must be a Boolean");
+                                return;
+                            }
+                            Err(e) => {
+                                eprintln!("Runtime Error: {}", e);
+                                return;
+                            }   
+                        }
+                    }
+                }
+
                 Stmt::Print { value } => {
                     match self.evaluate(value) {
                         Ok(res) => print!("{}", res),

@@ -70,7 +70,7 @@ macro_rules! parse_math_op {
 use crate::token::Token;
 use crate::lexer::Lexer;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Integer(i64),
 
@@ -98,13 +98,13 @@ pub struct SyntaxError {
     pub line: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Condition {
     pub condition: Expr,
     pub program: Program,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Stmt {
     VarDeclaration {
         name: String,
@@ -115,6 +115,11 @@ pub enum Stmt {
     VarChange {
         name: String,
         value: Expr,
+    },
+
+    While {
+        condition: Expr,
+        program: Program,
     },
 
     ConditionChain {
@@ -130,7 +135,7 @@ pub enum Stmt {
     },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Program {
     pub statements: Vec<Stmt>,
 }
@@ -239,10 +244,12 @@ impl Parser {
             Token::KeywordVar => self.parse_var(true),
             Token::Identifier(_) => self.parse_var(false),
 
+            Token::KeywordIf => self.parse_condition(),
+
+            Token::KeywordWhile => self.parse_while(),
+
             Token::KeywordPrint => parse_print!(self, Print),
             Token::KeywordPrintln => parse_print!(self, Println),
-
-            Token::KeywordIf => self.parse_condition(),
 
             _ => Err(SyntaxError {
                 message: format!("Unexpected token: {:?}", self.current_token),
@@ -319,6 +326,20 @@ impl Parser {
         }
 
         Ok(Stmt::ConditionChain { conditions, else_condition })
+    }
+
+    fn parse_while(&mut self) -> Result<Stmt, SyntaxError> {
+        self.advance();
+
+        let condition = self.parse_expression()?;
+
+        expect_token!(self, Token::LeftCurlyBracket);
+
+        let program = self.parse_program(Token::RightCurlyBracket)?;
+
+        self.advance();
+
+        Ok(Stmt::While { condition, program })
     }
 
     fn advance(&mut self) {

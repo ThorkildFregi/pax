@@ -208,6 +208,8 @@ impl Lexer {
                     "elif" => Token::KeywordElif,
                     "else" => Token::KeywordElse,
 
+                    "while" => Token::KeywordWhile,
+
                     "print" => Token::KeywordPrint,
                     "println" => Token::KeywordPrintln,
 

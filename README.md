@@ -28,7 +28,7 @@ We are a fully open-source project and we encourage [contributions](#contribute)
 
 **Clean logic**: Tired of long ```if``` statements with a thousand nested conditions? Not here! Pax encourages and enforces the use of intermediate variables for better visibility and cleaner code. No parentheses allowed in conditions—keep it flat, keep it readable.
 
-**Scope Stack**: No more memory leaks or global mess. Pax uses a stack-based scoping system that keeps your data where it belongs. Variables declared with var are local. Once your if block ends, they're gone. No pollution, no leftovers. Need a variable from a parent scope? Pax automatically climbs down the stack to find it for you. Want a variable to survive the block? Add global to your declaration and it’ll stay at the base of the stack until the program ends.
+**Scope Stack**: No more memory leaks or global mess. Pax uses a stack-based scoping system that keeps your data where it belongs. Variables declared with ```var``` are local. Once your ```if``` block ends, they're gone. No pollution, no leftovers. Need a variable from a parent scope? Pax automatically climbs down the stack to find it for you. Want a variable to survive the block? Add ```global``` to your declaration and it’ll stay at the base of the stack until the program ends.
 
 ### Documentation
 

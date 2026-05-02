@@ -8,6 +8,8 @@ pub enum Token {
     KeywordElif,
     KeywordElse,
 
+    KeywordWhile,
+
     KeywordPrint,
     KeywordPrintln,
     
