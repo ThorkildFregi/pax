@@ -129,6 +129,11 @@ pub enum Stmt {
         value: Option<Expr>,
     },
 
+    For {
+        name_var: String,
+        list: Expr,
+        program: Program,
+    },
     While {
         condition: Expr,
         program: Program,
@@ -290,7 +295,8 @@ impl Parser {
             Token::Identifier(_) => self.parse_var(false),
 
             Token::KeywordIf => self.parse_condition(),
-
+            
+            Token::KeywordFor => self.parse_for(),
             Token::KeywordWhile => self.parse_while(),
 
             Token::KeywordPrint => parse_print!(self, Print),
@@ -418,6 +424,24 @@ impl Parser {
         }
 
         Ok(Stmt::ConditionChain { conditions, else_condition })
+    }
+
+    fn parse_for(&mut self) -> Result<Stmt, SyntaxError> {
+        self.advance();
+
+        let name_var = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
+
+        expect_token!(self, Token::KeywordIn);
+
+        let list = self.parse_expression()?;
+
+        expect_token!(self, Token::LeftCurlyBracket);
+
+        let program = self.parse_program(Token::RightCurlyBracket)?;
+
+        self.advance();
+
+        Ok(Stmt::For { name_var, list, program })
     }
 
     fn parse_while(&mut self) -> Result<Stmt, SyntaxError> {

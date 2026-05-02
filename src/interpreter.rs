@@ -216,7 +216,33 @@ impl Interpreter {
                         }
                     }
                 }
+                
+                Stmt::For { name_var, list, program } => {
+                    match self.evaluate(list) {
+                        Ok(Value::List(elements)) => {
+                            for element in elements {
+                                self.scope_stack.push(HashMap::new());
 
+                                self.scope_stack.last_mut().unwrap().insert(
+                                    name_var.clone(), 
+                                    VariableSlot { value: element, is_constant: false }
+                                );
+
+                                self.run(program.clone());
+
+                                self.scope_stack.pop();
+                            }
+                        }
+                        Ok(_) => {
+                            eprintln!("Runtime Error: Can only iterate over a List.");
+                            return;
+                        }
+                        Err(e) => {
+                            eprintln!("Runtime Error: {}", e);
+                            return;
+                        } 
+                    }
+                }
                 Stmt::While { condition, program } => {
                     loop {
                         match self.evaluate(condition.clone()) {

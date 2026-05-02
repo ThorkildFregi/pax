@@ -227,6 +227,8 @@ impl Lexer {
                     "elif" => Token::KeywordElif,
                     "else" => Token::KeywordElse,
 
+                    "for" => Token::KeywordFor,
+                    "in" => Token::KeywordIn,
                     "while" => Token::KeywordWhile,
 
                     "print" => Token::KeywordPrint,

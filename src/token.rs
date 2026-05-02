@@ -11,6 +11,8 @@ pub enum Token {
     KeywordElif,
     KeywordElse,
 
+    KeywordFor,
+    KeywordIn,
     KeywordWhile,
 
     KeywordPrint,
