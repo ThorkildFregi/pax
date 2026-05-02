@@ -10,6 +10,8 @@ pub enum Value {
     String(String),
 
     Boolean(bool),
+
+    List(Vec<Value>),
 }
 
 #[derive(Clone)]
@@ -156,6 +158,15 @@ impl Interpreter {
             }
             Expr::String(string) => Ok(Value::String(string)),
             Expr::Boolean(boolean) => Ok(Value::Boolean(boolean)),
+            Expr::List(elements) => {
+                let mut elems = Vec::new();
+                
+                for element in elements {
+                    elems.push(self.evaluate(element)?);
+                }
+
+                Ok(Value::List(elems))
+            }
             Expr::Unary { operator, right } => {
                 let res = self.evaluate(*right)?;
 
@@ -222,7 +233,23 @@ impl std::fmt::Display for Value {
         match self {
             Value::Integer(n) => write!(f, "{}", n),
             Value::String(s) => write!(f, "{}", s),
-            Value::Boolean(b) => write!(f, "{}", b)
+            Value::Boolean(b) => write!(f, "{}", b),
+            Value::List(elems) => {
+                write!(f, "[")?;
+                
+                for (i, elem) in elems.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    if matches!(elem, Value::String(_)) {
+                        write!(f, "\"{}\"", elem)?;
+                    } else {
+                        write!(f, "{}", elem)?;
+                    }
+                }
+                
+                write!(f, "]")
+            }
         }
     }
 }

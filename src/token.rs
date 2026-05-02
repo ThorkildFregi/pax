@@ -17,6 +17,8 @@ pub enum Token {
     RightBracket,
     LeftCurlyBracket,
     RightCurlyBracket,
+    LeftSquareBracket,
+    RightSquareBracket,
     
     Identifier(String),
 
@@ -27,6 +29,7 @@ pub enum Token {
     Boolean(bool),
 
     Assign,
+    Comma,
 
     And,
     Or,

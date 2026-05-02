@@ -45,6 +45,10 @@ impl Lexer {
                         self.state = 4;
                         self.pos += 1;
                     }
+                    ',' => {
+                        self.pos += 1;
+                        return Token::Comma;
+                    }
                     '!' => {
                         self.state = 5;
                         self.pos += 1;
@@ -72,6 +76,14 @@ impl Lexer {
                     '}' => {
                         self.pos += 1;
                         return Token::RightCurlyBracket;
+                    }
+                    '[' => {
+                        self.pos += 1;
+                        return Token::LeftSquareBracket;
+                    }
+                    ']' => {
+                        self.pos += 1;
+                        return Token::RightSquareBracket;
                     }
                     '&' => {
                         self.pos += 1;

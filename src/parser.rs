@@ -78,6 +78,8 @@ pub enum Expr {
 
     Boolean(bool),
 
+    List(Vec<Expr>),
+
     Variable(String),
 
     Unary {
@@ -227,11 +229,44 @@ impl Parser {
                 Ok(Expr::Boolean(value))
             }
 
+            Token::LeftSquareBracket => {
+                Ok(self.parse_list()?)
+            }
+
             _ => Err(SyntaxError {
                 message: format!("Unknown expression: {:?}", self.current_token),
                 line: self.lexer.line,
             }),
         }
+    }
+
+    fn parse_list(&mut self) -> Result<Expr, SyntaxError> {
+        self.advance();
+
+        let mut elements = Vec::new();
+
+        if self.current_token == Token::RightBracket {
+            self.advance();
+            return Ok(Expr::List(elements));
+        }
+
+        loop {
+            elements.push(self.parse_expression()?);
+
+            match self.current_token {
+                Token::Comma => {
+                    self.advance();
+                }
+                Token::RightSquareBracket => break,
+                _ => return Err(SyntaxError {
+                    message: "Expected ',' or ']' after list element".into(),
+                    line: self.lexer.line,
+                }),
+            }
+        }
+
+        self.advance();
+        Ok(Expr::List(elements))
     }
 
     fn parse_statement(&mut self) -> Result<Stmt, SyntaxError> {
