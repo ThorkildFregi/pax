@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-50bc1a21.js";
+            window.path_to_searchindex_js = "../searchindex-dda49e7a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-6696266a.js"></script>
+        <script src="../toc-8823c364.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -196,12 +196,48 @@
 <pre><code class="language-pax">my_list[2] = 5; // Changes the third element to 5
 </code></pre>
 <h3 id="adding--removing-elements"><a class="header" href="#adding--removing-elements">Adding &amp; Removing Elements</a></h3>
-<p>Need to resize your list? We’ve got you covered. Use the <code>append</code> keyword to add an element to the end, or <code>pop</code> to remove the last one.</p>
+<p>Need to resize your list? We’ve got you covered. Use the <code>append</code> to add an element to the end, or <code>pop</code> to remove the last one.</p>
 <p>Examples:</p>
 <pre><code class="language-pax">var my_list = [0, 1, 2];
 
 my_list.append(3); // my_list is now [0, 1, 2, 3]
 my_list.pop();     // my_list is now [0, 1, 2]
+</code></pre>
+<p>Note: The pop method can optionally accept an index as a parameter. If provided, it will remove the element at that specific index instead of the last one.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var list = ["a", "b", "c"];
+list.pop(1); // Removes "b"
+print(list);  // Output: ["a", "c"]
+</code></pre>
+<h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
+<p>Maps (also known as Dictionaries) are collections of key-value pairs. They are the perfect structure when you need to associate unique identifiers (keys) with specific data (values), allowing for lightning-fast lookups.</p>
+<h3 id="definition-1"><a class="header" href="#definition-1">Definition</a></h3>
+<p>In Pax, you define a Map using curly braces <code>{}</code>. Every entry consists of a String key, a colon <code>:</code>, and a Value.</p>
+<pre><code class="language-pax">var user = {
+    "name": "Paximus",
+    "level": 42,
+    "is_pro": true
+};
+</code></pre>
+<h3 id="accessing-and-modifying"><a class="header" href="#accessing-and-modifying">Accessing and modifying</a></h3>
+<p>To get a value or update it, use the key inside square brackets <code>[]</code>. If the key doesn’t exist when assigning, Pax will automatically create it for you!</p>
+<pre><code class="language-pax">print(user["name"]);     // Output: Paximus
+
+user["level"] = 43;     // Updates the value
+user["city"] = "Paris"; // Adds a new key-value pair
+</code></pre>
+<h3 id="removing-elements"><a class="header" href="#removing-elements">Removing elements</a></h3>
+<p>If you need to delete a key and its associated value, use the <code>remove</code> keyword followed by the key.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var settings = {
+    "theme": "dark",
+    "notifications": true,
+    "font_size": 14
+};
+
+settings.remove("notifications"); 
+
+print(settings); // Output: {"theme": "dark", "font_size": 14}
 </code></pre>
 
                     </main>

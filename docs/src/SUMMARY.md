@@ -13,4 +13,5 @@
     - [Variables](./common_programming_concepts/variables.md)
     - [Lists and Maps](./common_programming_concepts/lists-maps.md)
     - [Conditions](./common_programming_concepts/conditions.md)
+    - [Loops](./common_programming_concepts/loops.md)
     - [Comments](./common_programming_concepts/comments.md)

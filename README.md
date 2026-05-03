@@ -63,6 +63,8 @@ You can find pre-compiled binaries for Linux, macOS, and Windows on our [GitHub]
 Actually in v0.2.0-alpha, here are the new features:
 
 - Add Scope Stack
+- Add Lists and Maps
+- Add Loops
 
 ## License
 
@@ -75,6 +77,6 @@ We welcome contributions from everyone! Whether you want to fix a bug, suggest a
 To contribute:
 1. **Fork** the repositery
 2. **Create** a branch for your feature (```git checkout -b feature/amazing-feature```).
-3. **Commit** your changes (```git commit -m 'Add some amazing feature'```).
+3. **Commit** your changes (```git commit -m "Add some amazing feature"```).
 4. **Push** to the branch (```git push origin feature/amazing-feature```).
 5. **Open** a Pull Request.

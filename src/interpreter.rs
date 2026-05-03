@@ -213,46 +213,6 @@ impl Interpreter {
                                 eprintln!("Runtime Error: Variable '{}' not found", name);
                             }
                         }
-                        "insert" => {
-                            if let Some(new_val) = value && let Some(new_k) = key {
-                                let new_value = match self.evaluate(new_val) {
-                                    Ok(v) => v,
-                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
-                                };
-
-                                let new_key = match self.evaluate(new_k) {
-                                    Ok(Value::String(s)) => s,
-                                    Ok(_) => { eprintln!("Type Error: key must be of type string"); return; },
-                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
-                                };
-
-                                let mut found = false;
-                                for scope in self.scope_stack.iter_mut().rev() {
-                                    if let Some(slot) = scope.get_mut(&name) {
-                                        if slot.is_constant {
-                                            eprintln!("Runtime Error: Can't modify constant '{}'", name);
-                                            return;
-                                        }
-
-                                        match &mut slot.value {
-                                            Value::Map(map) => {
-                                                map.insert(new_key, new_value);
-                                            }
-                                            _ => {
-                                                eprintln!("Runtime Error: Variable '{}' is not a list", name);
-                                                return;
-                                            }
-                                        }
-                                        found = true;
-                                        break;
-                                    }
-                                }
-
-                                if !found {
-                                    eprintln!("Runtime Error: Variable '{}' not found", name);
-                                }
-                            }
-                        }
                         "remove" => {
                             if let Some(k) = key {
                                 let key = match self.evaluate(k) {

@@ -392,19 +392,6 @@ impl Parser {
 
                     return Ok(Stmt::CollectionModification { name, operation: "pop".into(), key: key, value: None });
                 }
-                Token::KeywordInsert => {
-                    self.advance();
-
-                    expect_token!(self, Token::LeftBracket);
-                    let key = Some(self.parse_expression()?);
-                    expect_token!(self, Token::Comma);
-                    let value = Some(self.parse_expression()?);
-                    expect_token!(self, Token::RightBracket);
-
-                    expect_token!(self, Token::Semicolon);
-
-                    return Ok(Stmt::CollectionModification { name, operation: "insert".into(), key: key, value: value });
-                }
                 Token::KeywordRemove => {
                     self.advance();
 
