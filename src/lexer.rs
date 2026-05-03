@@ -45,6 +45,18 @@ impl Lexer {
                         self.state = 4;
                         self.pos += 1;
                     }
+                    ',' => {
+                        self.pos += 1;
+                        return Token::Comma;
+                    }
+                    '.' => {
+                        self.pos += 1;
+                        return Token::Dot;
+                    }
+                    ':' => {
+                        self.pos += 1;
+                        return Token::Colon;
+                    }
                     '!' => {
                         self.state = 5;
                         self.pos += 1;
@@ -72,6 +84,14 @@ impl Lexer {
                     '}' => {
                         self.pos += 1;
                         return Token::RightCurlyBracket;
+                    }
+                    '[' => {
+                        self.pos += 1;
+                        return Token::LeftSquareBracket;
+                    }
+                    ']' => {
+                        self.pos += 1;
+                        return Token::RightSquareBracket;
                     }
                     '&' => {
                         self.pos += 1;
@@ -202,10 +222,19 @@ impl Lexer {
                 match value.as_str() {
                     "var" => Token::KeywordVar,
                     "const" => Token::KeywordConst,
+                    "global" => Token::KeywordGlobal,
+
+                    "append" => Token::KeywordAppend,
+                    "pop" => Token::KeywordPop,
+                    "remove" => Token::KeywordRemove,
 
                     "if" => Token::KeywordIf,
                     "elif" => Token::KeywordElif,
                     "else" => Token::KeywordElse,
+
+                    "for" => Token::KeywordFor,
+                    "in" => Token::KeywordIn,
+                    "while" => Token::KeywordWhile,
 
                     "print" => Token::KeywordPrint,
                     "println" => Token::KeywordPrintln,

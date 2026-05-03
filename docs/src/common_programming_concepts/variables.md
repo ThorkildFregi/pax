@@ -67,3 +67,60 @@ print(PI); // This works perfectly.
 ```
 
 Note: Convention dictates that ```const``` variables should be named in UPPERCASE. This helps other developers (and your future self) immediately recognize that this value is set in stone.
+
+## Scoping
+
+Pax uses a Scope Stack mechanism to manage variables. This ensures memory safety and prevents "variable pollution" by automatically destroying local data when it is no longer needed.
+
+### The Scope Stack
+
+Every Every time you enter a conditional, loop or function block, Pax pushes a new "level" onto the memory stack.
+
+When you use a variable, Pax searches from the top of the stack (most local) to the bottom (global).
+
+If you declare a variable with the same name as one in a parent scope, the local version "shadows" the outer one until the current block ends.
+
+When a block ends, the top scope is "popped" (deleted), and all local variables inside it are cleared from memory.
+
+### Variable declaration
+
+By default, variables are local to the block where they are declared.
+
+```pax
+var x = 10
+if true {
+    var y = 20
+    print(x + y) // Works: x is found in the parent scope
+}
+print(y) // Error: y was destroyed when the 'if' block ended
+```
+
+### Global Variables
+
+If you need a variable to persist or be accessible from anywhere, use the ```global``` modifier. This forces the variable to be stored at the very bottom of the stack (Index 0), making it survive even after the current block closes.
+
+Note: Use local variables by default. Only use ```global``` when data must transcend its current hallway.
+
+```pax
+if true {
+    var global total = 100
+}
+print(total) // Works: 'total' is stored in the Global Scope
+```
+
+## Advanced Modifiers
+
+In most languages, you have to remember if it's ```static public readonly``` or ```public static readonly```. In Pax, we believe your brain is better used for logic than for memorizing keywords order.
+
+As long as you start with ```var```, you can mix your modifiers however you like.
+
+All of these are valid and strictly equivalent:
+
+```pax
+var global const pi = 3.14
+var const global pi = 3.14
+var const pi = 3.14  // (Local constant)
+var global pi = 3.14 // (Global mutable)
+```
+
+Why? Because our parser uses a "smart-collect" loop. It gathers all your flags first, then builds the variable. No more syntax errors because you swapped two words.

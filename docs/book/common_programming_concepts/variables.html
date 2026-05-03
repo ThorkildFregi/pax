@@ -35,10 +35,10 @@
             const path_to_root = "../";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "../searchindex-e6170ac9.js";
+            window.path_to_searchindex_js = "../searchindex-dda49e7a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="../toc-a4c1f376.js"></script>
+        <script src="../toc-8823c364.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -224,6 +224,40 @@ PI = 4; // Error! You can't do that.
 print(PI); // This works perfectly.
 </code></pre>
 <p>Note: Convention dictates that <code>const</code> variables should be named in UPPERCASE. This helps other developers (and your future self) immediately recognize that this value is set in stone.</p>
+<h2 id="scoping"><a class="header" href="#scoping">Scoping</a></h2>
+<p>Pax uses a Scope Stack mechanism to manage variables. This ensures memory safety and prevents “variable pollution” by automatically destroying local data when it is no longer needed.</p>
+<h3 id="the-scope-stack"><a class="header" href="#the-scope-stack">The Scope Stack</a></h3>
+<p>Every Every time you enter a conditional, loop or function block, Pax pushes a new “level” onto the memory stack.</p>
+<p>When you use a variable, Pax searches from the top of the stack (most local) to the bottom (global).</p>
+<p>If you declare a variable with the same name as one in a parent scope, the local version “shadows” the outer one until the current block ends.</p>
+<p>When a block ends, the top scope is “popped” (deleted), and all local variables inside it are cleared from memory.</p>
+<h3 id="variable-declaration-1"><a class="header" href="#variable-declaration-1">Variable declaration</a></h3>
+<p>By default, variables are local to the block where they are declared.</p>
+<pre><code class="language-pax">var x = 10
+if true {
+    var y = 20
+    print(x + y) // Works: x is found in the parent scope
+}
+print(y) // Error: y was destroyed when the 'if' block ended
+</code></pre>
+<h3 id="global-variables"><a class="header" href="#global-variables">Global Variables</a></h3>
+<p>If you need a variable to persist or be accessible from anywhere, use the <code>global</code> modifier. This forces the variable to be stored at the very bottom of the stack (Index 0), making it survive even after the current block closes.</p>
+<p>Note: Use local variables by default. Only use <code>global</code> when data must transcend its current hallway.</p>
+<pre><code class="language-pax">if true {
+    var global total = 100
+}
+print(total) // Works: 'total' is stored in the Global Scope
+</code></pre>
+<h2 id="advanced-modifiers"><a class="header" href="#advanced-modifiers">Advanced Modifiers</a></h2>
+<p>In most languages, you have to remember if it’s <code>static public readonly</code> or <code>public static readonly</code>. In Pax, we believe your brain is better used for logic than for memorizing keywords order.</p>
+<p>As long as you start with <code>var</code>, you can mix your modifiers however you like.</p>
+<p>All of these are valid and strictly equivalent:</p>
+<pre><code class="language-pax">var global const pi = 3.14
+var const global pi = 3.14
+var const pi = 3.14  // (Local constant)
+var global pi = 3.14 // (Global mutable)
+</code></pre>
+<p>Why? Because our parser uses a “smart-collect” loop. It gathers all your flags first, then builds the variable. No more syntax errors because you swapped two words.</p>
 
                     </main>
 
@@ -233,7 +267,7 @@ print(PI); // This works perfectly.
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                             </a>
 
-                            <a rel="next prefetch" href="../common_programming_concepts/conditions.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../common_programming_concepts/lists-maps.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                             </a>
 
@@ -247,7 +281,7 @@ print(PI); // This works perfectly.
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M41.4 233.4c-12.5 12.5-12.5 32.8 0 45.3l160 160c12.5 12.5 32.8 12.5 45.3 0s12.5-32.8 0-45.3L109.3 256 246.6 118.6c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0l-160 160z"/></svg></span>
                     </a>
 
-                    <a rel="next prefetch" href="../common_programming_concepts/conditions.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../common_programming_concepts/lists-maps.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <span class=fa-svg><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><!--! Font Awesome Free 6.2.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2022 Fonticons, Inc. --><path d="M278.6 233.4c12.5 12.5 12.5 32.8 0 45.3l-160 160c-12.5 12.5-32.8 12.5-45.3 0s-12.5-32.8 0-45.3L210.7 256 73.4 118.6c-12.5-12.5-12.5-32.8 0-45.3s32.8-12.5 45.3 0l160 160z"/></svg></span>
                     </a>
             </nav>

@@ -1,6 +1,6 @@
 [package]
 name = "pax"
-version = "0.1.0-alpha"
+version = "0.2.0-alpha"
 authors=["Gabriel Bermes--Poupeau"]
 edition="2024"
 description = "A lightning-fast, memory-safe language for data science and statistics, built from the ground up with Rust."

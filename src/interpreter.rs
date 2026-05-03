@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::{BTreeMap, HashMap};
 
 use crate::token::Token;
 use crate::parser::{Program, Stmt, Expr};
@@ -10,6 +10,9 @@ pub enum Value {
     String(String),
 
     Boolean(bool),
+
+    List(Vec<Value>),
+    Map(BTreeMap<String, Value>)
 }
 
 #[derive(Clone)]
@@ -19,46 +22,233 @@ struct VariableSlot {
 }
 
 pub struct Interpreter {
-    variables: HashMap<String, VariableSlot>,
+    scope_stack: Vec<HashMap<String, VariableSlot>>,
 }
 
 impl Interpreter {
     pub fn new() -> Self {
         Self {
-            variables: HashMap::new(),
+            scope_stack: vec![HashMap::new()],
         }
     }
 
     pub fn run(&mut self, program: Program) {
         for stmt in program.statements {
             match stmt {
-                Stmt::VarDeclaration { name, value, is_constant } => {
+                Stmt::VarDeclaration { name, value, is_constant, is_global } => {
                     match self.evaluate(value) {
-                        Ok(res) => { self.variables.insert(name, VariableSlot { value: res, is_constant }); },
+                        Ok(res) => {
+                            if is_global {
+                                self.scope_stack[0].insert(name, VariableSlot { value: res, is_constant });
+                            } else {
+                                self.scope_stack.last_mut().unwrap().insert(name, VariableSlot { value: res, is_constant });
+                            }
+                        }
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
                     }
                 }
                 Stmt::VarChange { name, value } => {
                     match self.evaluate(value) {
                         Ok(new_val) => {
-                            if let Some(slot) = self.variables.get_mut(&name) {
-                                if slot.is_constant {
-                                    eprintln!("Runtime Error: Can't modify constant variable '{}'", name);
-                                    return;
-                                }
+                            let mut found = false;
+                            for scope in self.scope_stack.iter_mut().rev() {
+                                if let Some(slot) = scope.get_mut(&name) {
+                                    if slot.is_constant {
+                                        eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                        return;
+                                    }
 
-                                if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
-                                    slot.value = new_val;
-                                } else {
-                                    eprintln!("Runtime Error: TypeError: Variable '{}' must remain of the same type", name);
-                                    return;
+                                    if std::mem::discriminant(&slot.value) == std::mem::discriminant(&new_val) {
+                                        slot.value = new_val;
+                                        found = true;
+                                        break;
+                                    } else {
+                                        eprintln!("Runtime Error: TypeError for '{}'", name);
+                                        return;
+                                    }
                                 }
-                            } else {
-                                eprintln!("Runtime Error: Variable '{}' not declared. Use 'var' first.", name);
+                            }
+                            if !found {
+                                eprintln!("Runtime Error: Variable '{}' not found", name);
                                 return;
                             }
                         },
+                        Err(e) => { eprintln!("{}", e); return; }
+                    }
+                }
+                Stmt::CollectionChange { name, index, value } => {
+                    let new_val = match self.evaluate(value) {
+                        Ok(v) => v,
                         Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    };
+                    
+                    let evaluated_index = match self.evaluate(index) {
+                        Ok(v) => v,
+                        Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                    };
+
+                    let mut found = false;
+                    for scope in self.scope_stack.iter_mut().rev() {
+                        if let Some(slot) = scope.get_mut(&name) {
+                            if slot.is_constant {
+                                eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                return;
+                            }
+
+                            match &mut slot.value {
+                                Value::List(list) => {
+                                    if let Value::Integer(idx) = evaluated_index {
+                                        if idx >= 0 && (idx as usize) < list.len() {
+                                            list[idx as usize] = new_val;
+                                        } else {
+                                            eprintln!("Runtime Error: Index {} out of bounds", idx);
+                                            return;
+                                        }
+                                    } else {
+                                        eprintln!("Runtime Error: List index must be an integer");
+                                        return;
+                                    }
+                                }
+                                Value::Map(map) => {
+                                    if let Value::String(key) = evaluated_index {
+                                        map.insert(key, new_val);
+                                    } else {
+                                        eprintln!("Runtime Error: Map index must be a string");
+                                        return;
+                                    }
+                                }
+                                _ => {
+                                    eprintln!("Runtime Error: '{}' is not a collection", name);
+                                    return;
+                                }
+                            }
+                            found = true;
+                            break;
+                        }
+                    }
+
+                    if !found {
+                        eprintln!("Runtime Error: Variable '{}' not found", name);
+                    }
+                }
+                Stmt::CollectionModification { name, operation, key, value } => {
+                    match operation.as_str() {
+                        "append" => {
+                            if let Some(new_val) = value {
+                                let new_value = match self.evaluate(new_val) {
+                                    Ok(v) => v,
+                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                                };
+
+                                let mut found = false;
+                                for scope in self.scope_stack.iter_mut().rev() {
+                                    if let Some(slot) = scope.get_mut(&name) {
+                                        if slot.is_constant {
+                                            eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                            return;
+                                        }
+
+                                        match &mut slot.value {
+                                            Value::List(list) => {
+                                                list.push(new_value);
+                                            }
+                                            _ => {
+                                                eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                                return;
+                                            }
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if !found {
+                                    eprintln!("Runtime Error: Variable '{}' not found", name);
+                                }
+                            }
+                        }
+                        "pop" => {
+                            let mut index = None;
+
+                            if let Some(k) = key {
+                                index = match self.evaluate(k) {
+                                    Ok(Value::Integer(i)) => Some(i),
+                                    Ok(_) => { eprintln!("Type Error: index must be of type index"); return; },
+                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                                };
+                            }
+
+                            let mut found = false;
+                            for scope in self.scope_stack.iter_mut().rev() {
+                                if let Some(slot) = scope.get_mut(&name) {
+                                    if slot.is_constant {
+                                        eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                        return;
+                                    }
+
+                                    match &mut slot.value {
+                                        Value::List(list) => {
+                                            if let Some(idx) = index{
+                                                if idx >= 0 && (idx as usize) < list.len() {
+                                                    list.remove(idx as usize);
+                                                } else {
+                                                    eprintln!("Runtime Error: Index {} out of bounds", idx);
+                                                    return;
+                                                }
+                                            } else {
+                                                list.pop();
+                                            }
+                                        }
+                                        _ => {
+                                            eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                            return;
+                                        }
+                                    }
+                                    found = true;
+                                    break;
+                                }
+                            }
+
+                            if !found {
+                                eprintln!("Runtime Error: Variable '{}' not found", name);
+                            }
+                        }
+                        "remove" => {
+                            if let Some(k) = key {
+                                let key = match self.evaluate(k) {
+                                    Ok(Value::String(s)) => s,
+                                    Ok(_) => { eprintln!("Type Error: index must be of type index"); return; },
+                                    Err(e) => { eprintln!("Runtime Error: {}", e); return; }
+                                };
+
+                                let mut found = false;
+                                for scope in self.scope_stack.iter_mut().rev() {
+                                    if let Some(slot) = scope.get_mut(&name) {
+                                        if slot.is_constant {
+                                            eprintln!("Runtime Error: Can't modify constant '{}'", name);
+                                            return;
+                                        }
+
+                                        match &mut slot.value {
+                                            Value::Map(map) => {
+                                                map.remove(&key);
+                                            }
+                                            _ => {
+                                                eprintln!("Runtime Error: Variable '{}' is not a list", name);
+                                                return;
+                                            }
+                                        }
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if !found {
+                                    eprintln!("Runtime Error: Variable '{}' not found", name);
+                                }
+                                }
+                            }
+                        _ => (),
                     }
                 }
 
@@ -70,8 +260,10 @@ impl Interpreter {
                             Ok(res) => {
                                 if let Value::Boolean(b) = res {
                                     if b {
-                                        let mut interpreter = Interpreter::new();
-                                        interpreter.run(cond.program);
+                                        self.scope_stack.push(HashMap::new());
+                                        self.run(cond.program);
+                                        self.scope_stack.pop();
+                                        
                                         executed = true; 
                                         break;
                                     }
@@ -85,8 +277,56 @@ impl Interpreter {
                     }
                     if !executed {
                         if let Some(prog) = else_condition {
-                            let mut interpreter = Interpreter::new();
-                            interpreter.run(prog);
+                            self.scope_stack.push(HashMap::new());
+                            self.run(prog);
+                            self.scope_stack.pop();
+                        }
+                    }
+                }
+                
+                Stmt::For { name_var, list, program } => {
+                    match self.evaluate(list) {
+                        Ok(Value::List(elements)) => {
+                            for element in elements {
+                                self.scope_stack.push(HashMap::new());
+
+                                self.scope_stack.last_mut().unwrap().insert(
+                                    name_var.clone(), 
+                                    VariableSlot { value: element, is_constant: false }
+                                );
+
+                                self.run(program.clone());
+
+                                self.scope_stack.pop();
+                            }
+                        }
+                        Ok(_) => {
+                            eprintln!("Runtime Error: Can only iterate over a List.");
+                            return;
+                        }
+                        Err(e) => {
+                            eprintln!("Runtime Error: {}", e);
+                            return;
+                        } 
+                    }
+                }
+                Stmt::While { condition, program } => {
+                    loop {
+                        match self.evaluate(condition.clone()) {
+                            Ok(Value::Boolean(true)) => {
+                                self.scope_stack.push(HashMap::new());
+                                self.run(program.clone()); 
+                                self.scope_stack.pop();
+                            }
+                            Ok(Value::Boolean(false)) => break,
+                            Ok(_) => {
+                                eprintln!("Runtime Error: Condition must be a Boolean");
+                                return;
+                            }
+                            Err(e) => {
+                                eprintln!("Runtime Error: {}", e);
+                                return;
+                            }   
                         }
                     }
                 }
@@ -107,14 +347,39 @@ impl Interpreter {
         }
     }
 
-    fn evaluate(&self, expr: Expr) -> Result<Value, String> {
+    fn evaluate(&mut self, expr: Expr) -> Result<Value, String> {
         match expr {
             Expr::Integer(n) => Ok(Value::Integer(n)),
             Expr::Variable(name) => {
-                Ok(self.variables.get(&name).cloned().ok_or_else(|| format!("Variable '{}' not found", name)).unwrap().value)
+                for scope in self.scope_stack.iter().rev() {
+                    if let Some(slot) = scope.get(&name) {
+                        return Ok(slot.value.clone());
+                    }
+                }
+                Err(format!("Runtime Error: Variable '{}' not found", name))
             }
             Expr::String(string) => Ok(Value::String(string)),
             Expr::Boolean(boolean) => Ok(Value::Boolean(boolean)),
+            Expr::List(elements) => {
+                let mut elems = Vec::new();
+                
+                for element in elements {
+                    elems.push(self.evaluate(element)?);
+                }
+
+                Ok(Value::List(elems))
+            }
+            Expr::Map(elements) => {
+                let mut map = BTreeMap::new();
+
+                for element in elements {
+                    if let Value::String(key) = self.evaluate(element.0)? {
+                        map.insert(key, self.evaluate(element.1)?);
+                    }
+                }
+
+                Ok(Value::Map(map))
+            }
             Expr::Unary { operator, right } => {
                 let res = self.evaluate(*right)?;
 
@@ -181,7 +446,35 @@ impl std::fmt::Display for Value {
         match self {
             Value::Integer(n) => write!(f, "{}", n),
             Value::String(s) => write!(f, "{}", s),
-            Value::Boolean(b) => write!(f, "{}", b)
+            Value::Boolean(b) => write!(f, "{}", b),
+            Value::List(elems) => {
+                write!(f, "[")?;
+                
+                for (i, elem) in elems.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    if matches!(elem, Value::String(_)) {
+                        write!(f, "\"{}\"", elem)?;
+                    } else {
+                        write!(f, "{}", elem)?;
+                    }
+                }
+                
+                write!(f, "]")
+            }
+            Value::Map(map) => {
+                write!(f, "{{")?;
+
+                for (i, (key, val)) in map.iter().enumerate() {
+                    if i > 0 {
+                        write!(f, ", ")?;
+                    }
+                    write!(f, "\"{}\": {}", key, val)?; 
+                }
+                
+                write!(f, "}}")
+            }
         }
     }
 }
