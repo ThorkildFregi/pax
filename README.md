@@ -28,7 +28,7 @@ We are a fully open-source project and we encourage [contributions](#contribute)
 
 **Clean logic**: Tired of long ```if``` statements with a thousand nested conditions? Not here! Pax encourages and enforces the use of intermediate variables for better visibility and cleaner code. No parentheses allowed in conditions—keep it flat, keep it readable.
 
-**Scope Stack**: No more memory leaks or global mess. Pax uses a stack-based scoping system that keeps your data where it belongs. Variables declared with var are local. Once your if block ends, they're gone. No pollution, no leftovers. Need a variable from a parent scope? Pax automatically climbs down the stack to find it for you. Want a variable to survive the block? Add global to your declaration and it’ll stay at the base of the stack until the program ends.
+**Scope Stack**: No more memory leaks or global mess. Pax uses a stack-based scoping system that keeps your data where it belongs. Variables declared with ```var``` are local. Once your ```if``` block ends, they're gone. No pollution, no leftovers. Need a variable from a parent scope? Pax automatically climbs down the stack to find it for you. Want a variable to survive the block? Add ```global``` to your declaration and it’ll stay at the base of the stack until the program ends.
 
 ### Documentation
 
@@ -63,6 +63,8 @@ You can find pre-compiled binaries for Linux, macOS, and Windows on our [GitHub]
 Actually in v0.2.0-alpha, here are the new features:
 
 - Add Scope Stack
+- Add Lists and Maps
+- Add Loops
 
 ## License
 
@@ -75,6 +77,6 @@ We welcome contributions from everyone! Whether you want to fix a bug, suggest a
 To contribute:
 1. **Fork** the repositery
 2. **Create** a branch for your feature (```git checkout -b feature/amazing-feature```).
-3. **Commit** your changes (```git commit -m 'Add some amazing feature'```).
+3. **Commit** your changes (```git commit -m "Add some amazing feature"```).
 4. **Push** to the branch (```git push origin feature/amazing-feature```).
 5. **Open** a Pull Request.

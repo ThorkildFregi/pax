@@ -67,16 +67,69 @@ macro_rules! parse_math_op {
     };
 }
 
+macro_rules! parse_collection {
+    ($parser:expr, $close_token:expr, $err_msg:expr, $is_map:expr) => {
+        {
+            $parser.advance();
+
+            if $parser.current_token == $close_token {
+                $parser.advance();
+                return if $is_map {
+                    Ok(Expr::Map(Vec::new()))
+                } else {
+                    Ok(Expr::List(Vec::new()))
+                };
+            }
+
+            let mut list_elements = Vec::new();
+            let mut map_elements = Vec::new();
+
+            loop {
+                if $is_map {
+                    let key = $parser.parse_expression()?;
+                    expect_token!($parser, Token::Colon);
+                    let value = $parser.parse_expression()?;
+                    map_elements.push((key, value));
+                } else {
+                    list_elements.push($parser.parse_expression()?);
+                }
+
+                if $parser.current_token == Token::Comma {
+                    $parser.advance();
+                } else if $parser.current_token == $close_token {
+                    break;
+                } else {
+                    return Err(SyntaxError {
+                        message: $err_msg.into(),
+                        line: $parser.lexer.line,
+                    });
+                }
+            }
+
+            $parser.advance();
+
+            return if $is_map {
+                Ok(Expr::Map(map_elements))
+            } else {
+                Ok(Expr::List(list_elements))
+            };
+        }
+    };
+}
+
 use crate::token::Token;
 use crate::lexer::Lexer;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Integer(i64),
 
     String(String),
 
     Boolean(bool),
+
+    List(Vec<Expr>),
+    Map(Vec<(Expr, Expr)>),
 
     Variable(String),
 
@@ -98,13 +151,13 @@ pub struct SyntaxError {
     pub line: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Condition {
     pub condition: Expr,
     pub program: Program,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Stmt {
     VarDeclaration {
         name: String,
@@ -115,6 +168,27 @@ pub enum Stmt {
     VarChange {
         name: String,
         value: Expr,
+    },
+    CollectionChange {
+        name: String,
+        index: Expr,
+        value: Expr,
+    },
+    CollectionModification {
+        name: String,
+        operation: String,
+        key: Option<Expr>,
+        value: Option<Expr>,
+    },
+
+    For {
+        name_var: String,
+        list: Expr,
+        program: Program,
+    },
+    While {
+        condition: Expr,
+        program: Program,
     },
 
     ConditionChain {
@@ -130,7 +204,7 @@ pub enum Stmt {
     },
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Program {
     pub statements: Vec<Stmt>,
 }
@@ -222,6 +296,10 @@ impl Parser {
                 Ok(Expr::Boolean(value))
             }
 
+            Token::LeftSquareBracket => parse_collection!(self, Token::RightSquareBracket, "Expected ',' or ']' after map element", false),
+
+            Token::LeftCurlyBracket => parse_collection!(self, Token::RightCurlyBracket, "Expected ',' or '}' after map element", true),
+
             _ => Err(SyntaxError {
                 message: format!("Unknown expression: {:?}", self.current_token),
                 line: self.lexer.line,
@@ -239,10 +317,13 @@ impl Parser {
             Token::KeywordVar => self.parse_var(true),
             Token::Identifier(_) => self.parse_var(false),
 
+            Token::KeywordIf => self.parse_condition(),
+            
+            Token::KeywordFor => self.parse_for(),
+            Token::KeywordWhile => self.parse_while(),
+
             Token::KeywordPrint => parse_print!(self, Print),
             Token::KeywordPrintln => parse_print!(self, Println),
-
-            Token::KeywordIf => self.parse_condition(),
 
             _ => Err(SyntaxError {
                 message: format!("Unexpected token: {:?}", self.current_token),
@@ -254,6 +335,7 @@ impl Parser {
     fn parse_var(&mut self, is_declaration: bool) -> Result<Stmt, SyntaxError> {
         let mut is_constant = false;
         let mut is_global = false;
+        let mut index_expr: Option<Expr> = None;
         
         if is_declaration {
             self.advance();
@@ -274,6 +356,59 @@ impl Parser {
         }
 
         let name = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
+    
+        if self.current_token == Token::LeftSquareBracket {
+            self.advance();
+            index_expr = Some(self.parse_expression()?);
+            expect_token!(self, Token::RightSquareBracket);
+
+        } else if self.current_token == Token::Dot {
+            self.advance();
+
+            match self.current_token {
+                Token::KeywordAppend => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    let value = Some(self.parse_expression()?);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::CollectionModification { name, operation: "append".into(), key: None, value: value });
+                }
+                Token::KeywordPop => {
+                    let mut key = None;
+
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    if let Ok(k) = self.parse_expression() {    
+                        key = Some(k);
+                    }
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::CollectionModification { name, operation: "pop".into(), key: key, value: None });
+                }
+                Token::KeywordRemove => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    let key = Some(self.parse_expression()?);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::CollectionModification { name, operation: "remove".into(), key: key, value: None });
+                }
+                _ => return Err(SyntaxError {
+                    message: "Keyword unknown".into(),
+                    line: self.lexer.line,
+                }),
+            }
+        }
 
         expect_token!(self, Token::Assign);
 
@@ -281,8 +416,17 @@ impl Parser {
 
         expect_token!(self, Token::Semicolon);
 
+        if is_declaration && index_expr.is_some() {
+            return Err(SyntaxError {
+                message: "Cannot index a variable during declaration".into(),
+                line: self.lexer.line,
+            });
+        }
+
         if is_declaration {
             Ok(Stmt::VarDeclaration { name, value, is_constant, is_global }) 
+        } else if let Some(index) = index_expr {
+            Ok(Stmt::CollectionChange { name, index, value })
         } else {
             Ok(Stmt::VarChange { name, value })
         }
@@ -319,6 +463,38 @@ impl Parser {
         }
 
         Ok(Stmt::ConditionChain { conditions, else_condition })
+    }
+
+    fn parse_for(&mut self) -> Result<Stmt, SyntaxError> {
+        self.advance();
+
+        let name_var = expect_token!(self, Token::Identifier(n) => n.clone(), "Expected variable name after 'var'".to_string());
+
+        expect_token!(self, Token::KeywordIn);
+
+        let list = self.parse_expression()?;
+
+        expect_token!(self, Token::LeftCurlyBracket);
+
+        let program = self.parse_program(Token::RightCurlyBracket)?;
+
+        self.advance();
+
+        Ok(Stmt::For { name_var, list, program })
+    }
+
+    fn parse_while(&mut self) -> Result<Stmt, SyntaxError> {
+        self.advance();
+
+        let condition = self.parse_expression()?;
+
+        expect_token!(self, Token::LeftCurlyBracket);
+
+        let program = self.parse_program(Token::RightCurlyBracket)?;
+
+        self.advance();
+
+        Ok(Stmt::While { condition, program })
     }
 
     fn advance(&mut self) {

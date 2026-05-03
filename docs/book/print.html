@@ -36,10 +36,10 @@
             const path_to_root = "";
             const default_light_theme = "light";
             const default_dark_theme = "navy";
-            window.path_to_searchindex_js = "searchindex-7c6e0b74.js";
+            window.path_to_searchindex_js = "searchindex-dda49e7a.js";
         </script>
         <!-- Start loading toc.js asap -->
-        <script src="toc-a4c1f376.js"></script>
+        <script src="toc-8823c364.js"></script>
     </head>
     <body>
     <div id="mdbook-help-container">
@@ -280,7 +280,7 @@ print(msg);
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="common-programming-concepts"><a class="header" href="#common-programming-concepts">Common Programming Concepts</a></h1>
 <p>This chapter is like the training wheels on a bike. You are about to discover the most important and basic concepts of programming languages, and therefore, of Pax.</p>
-<p>In this section, you will learn about data types, variables, conditions and comments.</p>
+<p>In this section, you will learn about data types, variables, conditions, comments and much more.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="data-types"><a class="header" href="#data-types">Data Types</a></h1>
 <p>Imagine you are in a kitchen; every step of a recipe requires a different utensil. Programming is the same, and your utensils are the data types. There are three essential families of data types: numbers, strings, and booleans. We will now look at each of these variants and what they are used for.</p>
@@ -380,6 +380,66 @@ var const pi = 3.14  // (Local constant)
 var global pi = 3.14 // (Global mutable)
 </code></pre>
 <p>Why? Because our parser uses a “smart-collect” loop. It gathers all your flags first, then builds the variable. No more syntax errors because you swapped two words.</p>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="lists-and-maps"><a class="header" href="#lists-and-maps">Lists And Maps</a></h1>
+<p>Pax provides two powerful built-in data structures to organize and manage your data efficiently: Lists (ordered sequences) and Maps (key-value pairs).</p>
+<h2 id="lists"><a class="header" href="#lists">Lists</a></h2>
+<p>Lists in Pax are dynamic, ordered collections of values. They are ideal for storing sequences of data that you need to access by index or iterate over.</p>
+<h3 id="definition"><a class="header" href="#definition">Definition</a></h3>
+<p>Define a list using square brackets []:</p>
+<p>Example:</p>
+<pre><code class="language-pax">var my_list = [0, 1, 2, 3, 4];
+</code></pre>
+<p>Note: Lists in Pax are zero-indexed. This means indices range from <code>0</code> to <code>len - 1</code>.</p>
+<h3 id="accessing--modifying-elements"><a class="header" href="#accessing--modifying-elements">Accessing &amp; Modifying Elements</a></h3>
+<p>To access or modify an element, use the list name followed by the index in square brackets:</p>
+<p>Example:</p>
+<pre><code class="language-pax">my_list[2] = 5; // Changes the third element to 5
+</code></pre>
+<h3 id="adding--removing-elements"><a class="header" href="#adding--removing-elements">Adding &amp; Removing Elements</a></h3>
+<p>Need to resize your list? We’ve got you covered. Use the <code>append</code> to add an element to the end, or <code>pop</code> to remove the last one.</p>
+<p>Examples:</p>
+<pre><code class="language-pax">var my_list = [0, 1, 2];
+
+my_list.append(3); // my_list is now [0, 1, 2, 3]
+my_list.pop();     // my_list is now [0, 1, 2]
+</code></pre>
+<p>Note: The pop method can optionally accept an index as a parameter. If provided, it will remove the element at that specific index instead of the last one.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var list = ["a", "b", "c"];
+list.pop(1); // Removes "b"
+print(list);  // Output: ["a", "c"]
+</code></pre>
+<h2 id="maps"><a class="header" href="#maps">Maps</a></h2>
+<p>Maps (also known as Dictionaries) are collections of key-value pairs. They are the perfect structure when you need to associate unique identifiers (keys) with specific data (values), allowing for lightning-fast lookups.</p>
+<h3 id="definition-1"><a class="header" href="#definition-1">Definition</a></h3>
+<p>In Pax, you define a Map using curly braces <code>{}</code>. Every entry consists of a String key, a colon <code>:</code>, and a Value.</p>
+<pre><code class="language-pax">var user = {
+    "name": "Paximus",
+    "level": 42,
+    "is_pro": true
+};
+</code></pre>
+<h3 id="accessing-and-modifying"><a class="header" href="#accessing-and-modifying">Accessing and modifying</a></h3>
+<p>To get a value or update it, use the key inside square brackets <code>[]</code>. If the key doesn’t exist when assigning, Pax will automatically create it for you!</p>
+<pre><code class="language-pax">print(user["name"]);     // Output: Paximus
+
+user["level"] = 43;     // Updates the value
+user["city"] = "Paris"; // Adds a new key-value pair
+</code></pre>
+<h3 id="removing-elements"><a class="header" href="#removing-elements">Removing elements</a></h3>
+<p>If you need to delete a key and its associated value, use the <code>remove</code> keyword followed by the key.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var settings = {
+    "theme": "dark",
+    "notifications": true,
+    "font_size": 14
+};
+
+settings.remove("notifications"); 
+
+print(settings); // Output: {"theme": "dark", "font_size": 14}
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="conditions"><a class="header" href="#conditions">Conditions</a></h1>
 <p>Conditions. Ah, conditions! You want to know if a number is odd or even? Conditions. You want to compare things? Conditions. Have you ever seen anything more powerful? (If you code in Rust, you know about macro rules, so you <em>have</em> seen something more powerful,but those aren’t included in Pax… for now). Let’s see how to use them right now!</p>
@@ -522,6 +582,32 @@ if check_a &amp; check_b &amp; check_c {
     // Clean, flat, and beautiful.
 }
 </code></pre>
+<div style="break-before: page; page-break-before: always;"></div>
+<h1 id="loops"><a class="header" href="#loops">Loops</a></h1>
+<p>Do you want to repeat the same line for an eternity for no particular reason? First, you’re weird. Second, you want to do something every developer has already done. Third, you can in Pax! Pax provides two main ways to repeat logic: <code>while</code> and <code>for</code>.</p>
+<h2 id="while"><a class="header" href="#while">While</a></h2>
+<p>Do you know <a href="#conditions"><code>If</code></a>? Then, you know <code>while</code>! It is just an <code>if</code> that repeats its code until the condition is <code>false</code>.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var fuel = 3;
+
+while fuel &gt; 0 {
+    print "Engine running...";
+    fuel = fuel - 1;
+}
+
+print "Out of gas.";
+</code></pre>
+<p>Warning: If your condition is always <code>true</code> (like <code>while 1 == 1</code>), you’ve just created an infinite loop. Welcome to the “weird” club.</p>
+<h2 id="for"><a class="header" href="#for">For</a></h2>
+<p>You do not like chaos. <code>For</code> is here to help you. The <code>for</code> loop is designed to iterate through a collection (like a <a href="#lists-and-maps">List</a>). It automatically creates a local variable that takes the value of each element in the sequence.</p>
+<p>Example:</p>
+<pre><code class="language-pax">var names = ["Alice", "Bob", "Charlie"];
+
+for name in names {
+    print("Hello, " + name);
+}
+</code></pre>
+<p>Note: The loop variable (e.g., <code>name</code>) only exists inside the loop’s curly braces.</p>
 <div style="break-before: page; page-break-before: always;"></div>
 <h1 id="comments"><a class="header" href="#comments">Comments</a></h1>
 <p>Do you want people to understand your code ? No, problem, you can add comments to your code and give indications to your fellow developers.</p>

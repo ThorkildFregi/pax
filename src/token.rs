@@ -1,12 +1,20 @@
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub enum Token {
     KeywordVar,
     KeywordConst,
     KeywordGlobal,
 
+    KeywordAppend,
+    KeywordPop,
+    KeywordRemove,
+
     KeywordIf,
     KeywordElif,
     KeywordElse,
+
+    KeywordFor,
+    KeywordIn,
+    KeywordWhile,
 
     KeywordPrint,
     KeywordPrintln,
@@ -15,6 +23,8 @@ pub enum Token {
     RightBracket,
     LeftCurlyBracket,
     RightCurlyBracket,
+    LeftSquareBracket,
+    RightSquareBracket,
     
     Identifier(String),
 
@@ -25,6 +35,9 @@ pub enum Token {
     Boolean(bool),
 
     Assign,
+    Comma,
+    Dot,
+    Colon,
 
     And,
     Or,
