@@ -67,44 +67,52 @@ macro_rules! parse_math_op {
     };
 }
 
-macro_rules! parse_list_map {
-    ($parser:expr, $token:expr, $to_push:expr, $err_msg:expr, $expression:ident) => {
+macro_rules! parse_collection {
+    ($parser:expr, $close_token:expr, $err_msg:expr, $is_map:expr) => {
         {
-            self.advance();
+            $parser.advance();
 
-            let mut elements = Vec::new();
-
-            if self.current_token == Token::RightCurlyBracket {
-                self.advance();
-                return Ok(Expr::Map(elements));
+            if $parser.current_token == $close_token {
+                $parser.advance();
+                return if $is_map {
+                    Ok(Expr::Map(Vec::new()))
+                } else {
+                    Ok(Expr::List(Vec::new()))
+                };
             }
+
+            let mut list_elements = Vec::new();
+            let mut map_elements = Vec::new();
 
             loop {
-                if $expression == Map {
-                    
+                if $is_map {
+                    let key = $parser.parse_expression()?;
+                    expect_token!($parser, Token::Colon);
+                    let value = $parser.parse_expression()?;
+                    map_elements.push((key, value));
+                } else {
+                    list_elements.push($parser.parse_expression()?);
                 }
-                let key = self.parse_expression()?;
 
-                expect_token!(self, Token::Colon);
-
-                let value = self.parse_expression()?;
-
-                elements.push((key, value));
-
-                match self.current_token {
-                    Token::Comma => {
-                        self.advance();
-                    }
-                    Token::RightCurlyBracket => break,
-                    _ => return Err(SyntaxError {
-                        message: "Expected ',' or '}' after map element".into(),
-                        line: self.lexer.line,
-                    }),
+                if $parser.current_token == Token::Comma {
+                    $parser.advance();
+                } else if $parser.current_token == $close_token {
+                    break;
+                } else {
+                    return Err(SyntaxError {
+                        message: $err_msg.into(),
+                        line: $parser.lexer.line,
+                    });
                 }
             }
 
-            self.advance();
-            Ok(Expr::Map(elements))
+            $parser.advance();
+
+            return if $is_map {
+                Ok(Expr::Map(map_elements))
+            } else {
+                Ok(Expr::List(list_elements))
+            };
         }
     };
 }
@@ -161,14 +169,15 @@ pub enum Stmt {
         name: String,
         value: Expr,
     },
-    ListChange {
+    CollectionChange {
         name: String,
         index: Expr,
         value: Expr,
     },
-    ListModification {
+    CollectionModification {
         name: String,
         operation: String,
+        key: Option<Expr>,
         value: Option<Expr>,
     },
 
@@ -287,52 +296,15 @@ impl Parser {
                 Ok(Expr::Boolean(value))
             }
 
-            Token::LeftSquareBracket => {
-                Ok(self.parse_list()?)
-            }
+            Token::LeftSquareBracket => parse_collection!(self, Token::RightSquareBracket, "Expected ',' or ']' after map element", false),
 
-            Token::LeftCurlyBracket => {
-                Ok(self.parse_map()?)
-            }
+            Token::LeftCurlyBracket => parse_collection!(self, Token::RightCurlyBracket, "Expected ',' or '}' after map element", true),
 
             _ => Err(SyntaxError {
                 message: format!("Unknown expression: {:?}", self.current_token),
                 line: self.lexer.line,
             }),
         }
-    }
-
-    fn parse_list(&mut self) -> Result<Expr, SyntaxError> {
-        self.advance();
-
-        let mut elements = Vec::new();
-
-        if self.current_token == Token::RightSquareBracket {
-            self.advance();
-            return Ok(Expr::List(elements));
-        }
-
-        loop {
-            elements.push(self.parse_expression()?);
-
-            match self.current_token {
-                Token::Comma => {
-                    self.advance();
-                }
-                Token::RightSquareBracket => break,
-                _ => return Err(SyntaxError {
-                    message: "Expected ',' or ']' after list element".into(),
-                    line: self.lexer.line,
-                }),
-            }
-        }
-
-        self.advance();
-        Ok(Expr::List(elements))
-    }
-
-    fn parse_map(&mut self) -> Result<Expr, SyntaxError> {
-        Ok(parse_list_map!(self, Token::RightCurlyBracket, "Expected ',' or '}' after map element", Map))
     }
 
     fn parse_statement(&mut self) -> Result<Stmt, SyntaxError> {
@@ -403,17 +375,46 @@ impl Parser {
 
                     expect_token!(self, Token::Semicolon);
 
-                    return Ok(Stmt::ListModification { name, operation: "append".into(), value: value });
+                    return Ok(Stmt::CollectionModification { name, operation: "append".into(), key: None, value: value });
                 }
                 Token::KeywordPop => {
+                    let mut key = None;
+
                     self.advance();
 
                     expect_token!(self, Token::LeftBracket);
+                    if let Ok(k) = self.parse_expression() {    
+                        key = Some(k);
+                    }
                     expect_token!(self, Token::RightBracket);
 
                     expect_token!(self, Token::Semicolon);
 
-                    return Ok(Stmt::ListModification { name, operation: "pop".into(), value: None });
+                    return Ok(Stmt::CollectionModification { name, operation: "pop".into(), key: key, value: None });
+                }
+                Token::KeywordInsert => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    let key = Some(self.parse_expression()?);
+                    expect_token!(self, Token::Comma);
+                    let value = Some(self.parse_expression()?);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::CollectionModification { name, operation: "insert".into(), key: key, value: value });
+                }
+                Token::KeywordRemove => {
+                    self.advance();
+
+                    expect_token!(self, Token::LeftBracket);
+                    let key = Some(self.parse_expression()?);
+                    expect_token!(self, Token::RightBracket);
+
+                    expect_token!(self, Token::Semicolon);
+
+                    return Ok(Stmt::CollectionModification { name, operation: "remove".into(), key: key, value: None });
                 }
                 _ => return Err(SyntaxError {
                     message: "Keyword unknown".into(),
@@ -438,7 +439,7 @@ impl Parser {
         if is_declaration {
             Ok(Stmt::VarDeclaration { name, value, is_constant, is_global }) 
         } else if let Some(index) = index_expr {
-            Ok(Stmt::ListChange { name, index, value })
+            Ok(Stmt::CollectionChange { name, index, value })
         } else {
             Ok(Stmt::VarChange { name, value })
         }

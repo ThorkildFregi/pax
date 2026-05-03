@@ -6,6 +6,8 @@ pub enum Token {
 
     KeywordAppend,
     KeywordPop,
+    KeywordInsert,
+    KeywordRemove,
 
     KeywordIf,
     KeywordElif,

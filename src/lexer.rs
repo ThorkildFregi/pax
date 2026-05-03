@@ -226,6 +226,8 @@ impl Lexer {
 
                     "append" => Token::KeywordAppend,
                     "pop" => Token::KeywordPop,
+                    "insert" => Token::KeywordInsert,
+                    "remove" => Token::KeywordRemove,
 
                     "if" => Token::KeywordIf,
                     "elif" => Token::KeywordElif,
